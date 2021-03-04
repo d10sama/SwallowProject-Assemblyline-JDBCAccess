@@ -1,8 +1,15 @@
 <!DOCTYPE html>
+<html lang="zh-CN">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>
         生产计划下发
     </title>
+
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <meta charset="UTF-8"> 
     <style>
         .header {
@@ -36,16 +43,104 @@
         .content :hover {
             color: darkgray
         }
+        
+        
+        div.input-group{
+            margin-bottom: 30px;
+        }
     </style>
+
 </head>
+
+<div class="container">
 <div class="Title">
     <h1>生产计划下发</h1>
 </div>
+
+<div class="sheet">
+<label for="basic-url">请输入数据：</label>
+<div class="input-group">
+  <span class="input-group-addon" id="basic-addon3">Line1set1</span>
+  <input type="text" class="form-control" id="line1set1" aria-describedby="basic-addon3">
+</div>
+<div class="input-group">
+    <span class="input-group-addon" id="basic-addon3">Lines1et2</span>
+    <input type="text" class="form-control" id="line1set2" aria-describedby="basic-addon3">
+  </div>
+  <div class="input-group">
+    <span class="input-group-addon" id="basic-addon3">Line1set3</span>
+    <input type="text" class="form-control" id="line1set3" aria-describedby="basic-addon3">
+  </div>
+  <div class="input-group">
+    <span class="input-group-addon" id="basic-addon3">Line2</span>
+    <input type="text" class="form-control" id="line2" aria-describedby="basic-addon3">
+  </div>
+  <div class="input-group">
+    <span class="input-group-addon" id="basic-addon3">Line3</span>
+    <input type="text" class="form-control" id="line3" aria-describedby="basic-addon3">
+  </div>
+  <div class="input-group">
+    <span class="input-group-addon" id="basic-addon3">Start</span>
+    <input type="text" class="form-control" id="start" aria-describedby="basic-addon3">
+  </div>
+  <div class="input-group">
+    <span class="input-group-addon" id="basic-addon3">End</span>
+    <input type="text" class="form-control" id="end" aria-describedby="basic-addon3">
+  </div>
+  <button type="button" onclick="generatenURL()" style="margin-left: 100px;">提交</button> <button type="button" onclick="Reset()" style="margin-left: 100px;">重置</button>
+</div>
+
+<div id="testArea">
+    <p id="test"></p>
+</div>
+
 <div class="time">
     <div id="show_time">
-        <script>
-            setInterval("fun(show_time)", 1);
+        <script>    
+            function generatenURL(){
+                let input1 = $('#line1set1').val();
+                let input2 = $('#line1set2').val();
+                let input3 = $('#line1set3').val();
+                let input4 = $('#line2').val();
+                let input5 = $('#line3').val();
+                let input6 = $('#start').val();
+                let input7 = $('#end').val();
+                let url = "http://localhost:8080/get?line1set1="+input1+"&line1set2="+input2+"&line1set3="+input3+"&line2="+input4+"&line3="+input5+"&startdate="+input6+"&enddate="+input7;
+                $('#test').text(url);
+                $.ajax(url,{
+                    method: 'GET'
+                });
+            }
 
+            function Reset(){
+                var now = new Date();
+
+                if(Number(now.getMonth()+1) < 10){
+                    var nowtime = now.getFullYear()+"0"+(now.getMonth()+1);
+                }
+                else{
+                    var nowtime = now.getFullYear()+(now.getMonth()+1);
+                }
+
+                if(Number(now.getDate() < 10)){
+                    nowtime += "0"+now.getDate();
+                }
+                else{
+                    nowtime += +now.getDate();
+                }
+                
+                $('#line1set1').val("");
+                $('#line1set2').val("");
+                $('#line1set3').val("");
+                $('#line2').val("");
+                $('#line3').val("");
+                $('#start').val(nowtime);
+                $('#end').val(nowtime);
+            }
+
+            $(Reset);
+
+            setInterval("fun(show_time)", 1);
             function fun(timeID) {
                 var date = new Date();
                 var y = date.getFullYear();
@@ -75,3 +170,5 @@
         </script>
     </div>
 </div>
+</div>
+</html>

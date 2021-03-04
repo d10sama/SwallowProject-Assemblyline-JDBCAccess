@@ -24,10 +24,8 @@ public class sample3_query {
     private static int ssn=1;
     private static int ssn2=1;
     private static long rows;
+    private static final String sentence2="select id  from sample3 order by id desc limit 0,1;";
 
-    @Autowired
-    @Qualifier("secondaryJdbcTemplate")
-    protected JdbcTemplate jdbcTemplate2;
     @Autowired
     @Qualifier("primaryJdbcTemplate")
     private JdbcTemplate jdbcTemplate1;
@@ -38,17 +36,16 @@ public class sample3_query {
         return result;
     }
     @RequestMapping("/sp3rows")
-    @Scheduled(fixedRate = 200)
+    @Scheduled(fixedRate = 500)
     //refresh info_page for 0.2ms
     public long rows() {
-        String sentence="select table_rows from tables where table_name=\"sample3\";";
-        return jdbcTemplate2.queryForObject(sentence,long.class);
+        return jdbcTemplate1.queryForObject(sentence2,long.class);
     }
     @RequestMapping("/function3")
     @ResponseBody
     public String fun1() {
         String fun1="y=ax+b,a=2,b=3,result = %f";
-        double result1=jdbcTemplate1.queryForObject(String.format("select length from sample1 where id=%d",ssn2++),double.class);
+        double result1=jdbcTemplate1.queryForObject(String.format("select length from sample3 where id=%d",ssn2++),double.class);
         return String.format(fun1,(result1*2+3));
     }
 }

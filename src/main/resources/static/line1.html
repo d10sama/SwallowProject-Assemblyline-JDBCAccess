@@ -1,84 +1,278 @@
+<!-- TODO:检查监控窗口的DOM -->
+
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
-
-</html>
-
+<html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <title>line1</title>
+    <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"> 
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://cdn.staticfile.org/echarts/5.0.0/echarts.min.js"></script>
+    <script src="wonderland.js"></script>
+    <title>生产线1</title>
+    
     <style type=text/css>
+        .hamburger {
+            background: transparent;
+            border: none;
+            display: block;
+            height: 32px;
+            margin-left: 15px;
+            position: relative;
+            top: 20px;
+            width: 32px;
+            z-index: 999;
+        }
+        .hamburger:hover {
+            outline: none;
+        }
+        .hamburger:focus {
+            outline: none;
+        }
+        .hamburger:active {
+            outline: none;
+        }
+        .hamburger.is-closed:before {
+            -webkit-transform: translate3d(0, 0, 0);
+            -webkit-transition: all 0.35s ease-in-out;
+            color: #ffffff;
+            content: '';
+            display: block;
+            font-size: 14px;
+            line-height: 32px;
+            opacity: 0;
+            text-align: center;
+            width: 100px;
+        }
+        .hamburger.is-closed:hover before {
+            -webkit-transform: translate3d(-100px, 0, 0);
+            -webkit-transition: all 0.35s ease-in-out;
+            display: block;
+            opacity: 1;
+        }
+        .hamburger.is-closed:hover .hamb-top {
+            -webkit-transition: all 0.35s ease-in-out;
+            top: 0;
+        }
+        .hamburger.is-closed:hover .hamb-bottom {
+            -webkit-transition: all 0.35s ease-in-out;
+            bottom: 0;
+        }
+        .hamburger.is-closed .hamb-top {
+            -webkit-transition: all 0.35s ease-in-out;
+            background-color: rgba(0, 0, 0, 0.7);
+            top: 5px;
+        }
+        .hamburger.is-closed .hamb-middle {
+            background-color: rgba(0, 0, 0, 0.7);
+            margin-top: -2px;
+            top: 50%;
+        }
+        .hamburger.is-closed .hamb-bottom {
+            -webkit-transition: all 0.35s ease-in-out;
+            background-color: rgba(0, 0, 0, 0.7);
+            bottom: 5px;
+        }
+        .hamburger.is-closed .hamb-top,
+        .hamburger.is-closed .hamb-middle,
+        .hamburger.is-closed .hamb-bottom,
+        .hamburger.is-open .hamb-top,
+        .hamburger.is-open .hamb-middle,
+        .hamburger.is-open .hamb-bottom {
+            height: 4px;
+            left: 0;
+            position: absolute;
+            width: 100%;
+        }
+        .hamburger.is-open .hamb-top {
+            -webkit-transform: rotate(45deg);
+            -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.73, 1, 0.28, 0.08);
+            background-color: #000000;
+            margin-top: -2px;
+            top: 50%;
+        }
+        .hamburger.is-open .hamb-middle {
+            background-color: #000000;
+            display: none;
+        }
+        .hamburger.is-open .hamb-bottom {
+            -webkit-transform: rotate(-45deg);
+            -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.73, 1, 0.28, 0.08);
+            background-color: #000000;
+            margin-top: -2px;
+            top: 50%;
+        }
+        .hamburger.is-open:before {
+            -webkit-transform: translate3d(0, 0, 0);
+            -webkit-transition: all 0.35s ease-in-out;
+            color: #000000;
+            content: '';
+            display: block;
+            font-size: 14px;
+            line-height: 32px;
+            opacity: 0;
+            text-align: center;
+            width: 100px;
+        }
+        .hamburger.is-open:hover before {
+            -webkit-transform: translate3d(-100px, 0, 0);
+            -webkit-transition: all 0.35s ease-in-out;
+            display: block;
+            opacity: 1;
+        }
+        #wrapper {
+            -moz-transition: all 0.5s ease;
+            -o-transition: all 0.5s ease;
+            -webkit-transition: all 0.5s ease;
+            padding-left: 0;
+            transition: all 0.5s ease;
+        }
+        #wrapper.toggled {
+            padding-left: 220px;
+        }
+        #wrapper.toggled #sidebar-wrapper {
+            width: 220px;
+        }
+        #wrapper.toggled #page-content-wrapper {
+            margin-right: -220px;
+            position: absolute;
+        }
+        #sidebar-wrapper {
+            -moz-transition: all 0.5s ease;
+            -o-transition: all 0.5s ease;
+            -webkit-transition: all 0.5s ease;
+            background: #1a1a1a;
+            height: 100%;
+            left: 220px;
+            margin-left: -220px;
+            overflow-x: hidden;
+            overflow-y: auto;
+            transition: all 0.5s ease;
+            width: 0;
+            z-index: 1000;
+        }
+        #sidebar-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+        #page-content-wrapper {
+            padding-top: 10px;
+            width: 100%;
+        }
+        .sidebar-nav {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            position: absolute;
+            top: 0;
+            width: 220px;
+        }
+        .sidebar-nav li {
+            display: inline-block;
+            line-height: 20px;
+            position: relative;
+            width: 100%;
+        }
+        .sidebar-nav li:before {
+            background-color: #1c1c1c;
+            content: '';
+            height: 100%;
+            left: 0;
+            position: absolute;
+            top: 0;
+            -webkit-transition: width 0.2s ease-in;
+            transition: width 0.2s ease-in;
+            width: 3px;
+            z-index: -1;
+        }
+        .sidebar-nav li:first-child a {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+            .sidebar-nav li:nth-child(2):before {
+            background-color: #627dd7;
+        }
+        .sidebar-nav li:nth-child(3):before {
+            background-color: #627dd7;
+        }
+        .sidebar-nav li:nth-child(4):before {
+            background-color: #627dd7;
+        }
+        .sidebar-nav li:nth-child(5):before {
+            background-color: #627dd7;
+        }
+        .sidebar-nav li:nth-child(6):before {
+            background-color: #627dd7;
+        }
+        .sidebar-nav li:hover:before {
+            -webkit-transition: width 0.2s ease-in;
+            transition: width 0.2s ease-in;
+            width: 100%;
+        }
+        .sidebar-nav li a {
+            color: #dddddd;
+            display: block;
+            padding: 10px 15px 10px 30px;
+            text-decoration: none;
+        }
+        .sidebar-nav li.open:hover before {
+            -webkit-transition: width 0.2s ease-in;
+            transition: width 0.2s ease-in;
+            width: 100%;
+        }
+        .sidebar-nav .dropdown-menu {
+            background-color: #222222;
+            border-radius: 0;
+            border: none;
+            box-shadow: none;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            width: 100%;
+        }
+        .sidebar-nav li a:hover,
+        .sidebar-nav li a:active,
+        .sidebar-nav li a:focus,
+        .sidebar-nav li.open a:hover,
+        .sidebar-nav li.open a:active,
+        .sidebar-nav li.open a:focus {
+            background-color: transparent;
+            color: #ffffff;
+            text-decoration: none;
+        }
+        .sidebar-nav > .sidebar-brand {
+            font-size: 20px;
+            height: 65px;
+            line-height: 44px;
+        }
         @media screen and (max-width: 1200px) and (min-width: 0px) {
-            .box {
-                text-align: center;
-                margin: auto;
-                border: solid 2px black;
-                width: 1200px;
-                height: 736px;
-            }
-            .boxnav {
+            div.row .col-sm-12 {
                 width: 100%;
-                height: 64px;
+                height: 125px;
                 border: solid 2px black;
                 float: left;
             }
-            .box_style {
+            div.row .col-sm-4 {
                 width: 100%;
                 height: 364px;
                 border: solid 2px black;
                 float: left;
             }
-            label {
-                display: inline-block;
-                width: 30px;
-                height: 30px;
-                border: 5px;
-                border-style: double;
-                border-color: black;
-                margin-top: 12px;
-                float: left;
-                margin-left: 2px;
-            }
-            input {
-                display: none;
-            }
-            input+label:after {
-                content: "\2716";
-                font-size: 20px;
-                color: #FFF;
-            }
-            input:checked+label:after {
-                color: black;
-            }
             .form-input {
                 float: left;
                 margin-top: 20px;
-                margin-left: 2px;
-                margin-right: 50px;
+                margin-right: 13px;
+                margin-left: 13px;
             }
-            .Bigbox_Style {
-                text-align: center;
-                border: solid 2px black;
-                width: 1200px;
-                height: 736px;
-                display: none;
-            }
-        }
+        } 
         
+        /* 以下为PC端自适应CSS */
         @media screen and (min-width: 1200px) {
-            .box {
-                text-align: center;
-                margin: auto;
-                border: solid 5px black;
-                width: 1850px;
-                height: 800px;
-            }
-            .boxnav {
-                width: 1850px;
+            div.row .col-md-12 {              
                 height: 64px;
                 border: solid 2px black;
             }
-            .box_style {
-                width: 33.1%;
+            div.row .col-md-4 {        
                 height: 364px;
                 border: solid 2px black;
                 float: left;
@@ -94,9 +288,7 @@
                 float: left;
                 margin-left: 0.8%;
             }
-            input {
-                display: none;
-            }
+           
             input+label:after {
                 content: "\2716";
                 font-size: 20px;
@@ -111,17 +303,12 @@
                 margin-right: 10%;
                 margin-left: 5px;
             }
-            .Bigbox_Style {
-                text-align: center;
-                border: solid 2px black;
-                width: 1850px;
-                height: 730px;
+            input.form-input{
                 display: none;
             }
         }
     </style>
-    <script src="http://lib.sinaapp.com/js/jquery/1.7.2/jquery.min.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/jquery-resize/1.1/jquery.ba-resize.js"></script>
+    
     <script>
         $(document).ready(function() {
             $(function() {
@@ -149,12 +336,42 @@
                 });
             });
         });
+        $(document).ready(function() {
+            var trigger = $('.hamburger'),
+                overlay = $('.overlay'),
+                isClosed = false;
+            trigger.click(function() {
+                hamburger_cross();
+            });
+            function hamburger_cross() {
+                if (isClosed == true) {
+                    overlay.hide();
+                    trigger.removeClass('is-open');
+                    trigger.addClass('is-closed');
+                    isClosed = false;
+                } else {
+                    overlay.show();
+                    trigger.removeClass('is-closed');
+                    trigger.addClass('is-open');
+                    isClosed = true;
+                }
+            }
+            $('[data-toggle="offcanvas"]').click(function() {
+                $('#wrapper').toggleClass('toggled');
+            });
+        });
+
+        $(window).resize(function() {
+            Chart1.resize();
+            Chart2.resize();
+            Chart3.resize();
+            Chart4.resize();
+            Colchart.resize();
+        });
     </script>
     
-
     <script type="text/javascript">
         window.onload = function() {
-
             var checkbox1 = this.document.getElementById('cboxA');
             var checkbox2 = this.document.getElementById('cboxB');
             var checkbox3 = this.document.getElementById('cboxC');
@@ -163,292 +380,330 @@
             var checkbox6 = this.document.getElementById('cboxF');
 
             checkbox1.onclick = function() {
-                if (checkbox1.checked) {
-                    document.getElementById('chart1').style.display = 'block';
-                    document.getElementById('chart1').style.width='1850px';
-                    document.getElementById('chart1').style.height='700px';                    
-		            Chart1.resize();
-                    
-
-                    document.getElementById('chart2').style.display = 'none';
-                    document.getElementById('chart3').style.display = 'none';
-                    document.getElementById('chart4').style.display = 'none';
-                    document.getElementById('warningLog1').style.display = 'none';
-                    document.getElementById('warningLog2').style.display = 'none';
-                    document.getElementById('box1').style.display = 'block';
-                    document.getElementById('box2').style.display = 'none';
-                    document.getElementById('box3').style.display = 'none';
-                    document.getElementById('box4').style.display = 'none';
-                    document.getElementById('box5').style.display = 'none';
-                    document.getElementById('box6').style.display = 'none';
-
-                } else {
-                    document.getElementById('chart1').style.display = 'block';
-                    
-                    
-                    //复原的话只需要把对应的chart设置成原来的样式，然后resize就行。
-                    
-		            Chart1.resize();
-                    document.getElementById('chart2').style.display = 'block';
-                    document.getElementById('chart3').style.display = 'block';
-                    document.getElementById('chart4').style.display = 'block';
-                    document.getElementById('warningLog1').style.display = 'block';
-                    document.getElementById('warningLog2').style.display = 'block';
-                    document.getElementById('box1').style.display = 'none';
-                    document.getElementById('box2').style.display = 'none';
-                    document.getElementById('box3').style.display = 'none';
-                    document.getElementById('box4').style.display = 'none';
-                    document.getElementById('box5').style.display = 'none';
-                    document.getElementById('box6').style.display = 'none';
-
+                    $('#chart2').hide();
+                    $('#chart3').hide();
+                    $('#chart4').hide();
+                    $('#warningLog1').hide();
+                    $('#warningLog2').hide();        
+                    $('#box2').hide();
+                    $('#box3').hide();
+                    $('#box4').hide();
+                    $('#box5').hide();
+                    $('#box6').hide();
+                var c1 = $('#chart1');
+                if (checkbox1.checked) {         
+                    c1.animate({             
+                        height: '730px'
+                    }, 888,function(){
+                        Chart1.resize();
+                    });
+                   
+                } else {                  
+                    c1.animate({
+                        width: '612px',
+                        height: '364px'
+                    }, 888,function(){
+                        Chart1.resize();
+                        $('#chart2').fadeIn();
+                        $('#chart3').fadeIn();
+                        $('#chart4').fadeIn();
+                        $('#warningLog1').fadeIn();
+                        $('#warningLog2').fadeIn();                   
+                        $('#box2').fadeIn();
+                        $('#box3').fadeIn();
+                        $('#box4').fadeIn();
+                        $('#box5').fadeIn();
+                        $('#box6').fadeIn();                  
+                    }); 
                 }
             };
             checkbox2.onclick = function() {
-                if (checkbox2.checked) {
-                    document.getElementById('chart1').style.display = 'none';
-                    document.getElementById('chart2').style.display = 'block';
-                    document.getElementById('chart3').style.display = 'none';
-                    document.getElementById('chart4').style.display = 'none';
-                    document.getElementById('warningLog1').style.display = 'none';
-                    document.getElementById('warningLog2').style.display = 'none';
-                    document.getElementById('box2').style.display = 'block';
-                    document.getElementById('box1').style.display = 'none';
-                    document.getElementById('box3').style.display = 'none';
-                    document.getElementById('box4').style.display = 'none';
-                    document.getElementById('box5').style.display = 'none';
-                    document.getElementById('box6').style.display = 'none';
-
+                var c2 = $('#chart2');
+                if (checkbox2.checked) {         
+                    c2.animate({
+                        width: '1850px',
+                        height: '730px'
+                    }, 888,function(){
+                        Chart2.resize();
+                    });
+                    $('#chart1').hide();
+                    $('#chart3').hide();
+                    $('#chart4').hide();
+                    $('#warningLog1').hide();
+                    $('#warningLog2').hide();        
+                    $('#box1').hide();
+                    $('#box3').hide();
+                    $('#box4').hide();
+                    $('#box5').hide();
+                    $('#box6').hide();
                 } else {
-                    document.getElementById('chart1').style.display = 'block';
-                    document.getElementById('chart2').style.display = 'block';
-                    document.getElementById('chart3').style.display = 'block';
-                    document.getElementById('chart4').style.display = 'block';
-                    document.getElementById('warningLog1').style.display = 'block';
-                    document.getElementById('warningLog2').style.display = 'block';
-                    document.getElementById('box2').style.display = 'none';
-                    document.getElementById('box1').style.display = 'none';
-                    document.getElementById('box3').style.display = 'none';
-                    document.getElementById('box4').style.display = 'none';
-                    document.getElementById('box5').style.display = 'none';
-                    document.getElementById('box6').style.display = 'none';
-
+                    c2.animate({
+                        width: '612px',
+                        height: '364px'
+                    }, 888,function(){
+                        Chart2.resize();
+                        $('#chart1').fadeIn();
+                    $('#chart3').fadeIn();
+                    $('#chart4').fadeIn();
+                    $('#warningLog1').fadeIn();
+                    $('#warningLog2').fadeIn();                   
+                    $('#box1').fadeIn();
+                    $('#box3').fadeIn();
+                    $('#box4').fadeIn();
+                    $('#box5').fadeIn();
+                    $('#box6').fadeIn();
+                    });
+                   
                 }
             };
             checkbox3.onclick = function() {
-                if (checkbox3.checked) {
-                    document.getElementById('chart1').style.display = 'none';
-                    document.getElementById('chart2').style.display = 'none';
-                    document.getElementById('chart3').style.display = 'block';
-                    document.getElementById('chart4').style.display = 'none';
-                    document.getElementById('warningLog1').style.display = 'none';
-                    document.getElementById('warningLog2').style.display = 'none';
-                    document.getElementById('box3').style.display = 'block';
-                    document.getElementById('box1').style.display = 'none';
-                    document.getElementById('box3').style.display = 'none';
-                    document.getElementById('box4').style.display = 'none';
-                    document.getElementById('box5').style.display = 'none';
-                    document.getElementById('box6').style.display = 'none';
-
+                var c3 = $('#chart3');
+                if (checkbox3.checked) {         
+                    c3.animate({
+                        width: '1850px',
+                        height: '730px'
+                    }, 888,function(){
+                        Chart3.resize();
+                    });
+                    $('#chart1').hide();
+                    $('#chart2').hide();
+                    $('#chart4').hide();
+                    $('#warningLog1').hide();
+                    $('#warningLog2').hide();        
+                    $('#box1').hide();
+                    $('#box2').hide();
+                    $('#box4').hide();
+                    $('#box5').hide();
+                    $('#box6').hide();
                 } else {
-                    document.getElementById('chart1').style.display = 'block';
-                    document.getElementById('chart2').style.display = 'block';
-                    document.getElementById('chart3').style.display = 'block';
-                    document.getElementById('chart4').style.display = 'block';
-                    document.getElementById('warningLog1').style.display = 'block';
-                    document.getElementById('warningLog2').style.display = 'block';
-                    document.getElementById('box3').style.display = 'none';
-                    document.getElementById('box2').style.display = 'none';
-                    document.getElementById('box1').style.display = 'none';
-                    document.getElementById('box4').style.display = 'none';
-                    document.getElementById('box5').style.display = 'none';
-                    document.getElementById('box6').style.display = 'none';
-
+                    c3.animate({
+                        width: '612px',
+                        height: '364px'
+                    }, 888,function(){
+                        Chart3.resize();
+                        $('#chart1').fadeIn();
+                    $('#chart2').fadeIn();
+                    $('#chart4').fadeIn();
+                    $('#warningLog1').fadeIn();
+                    $('#warningLog2').fadeIn();                   
+                    $('#box1').fadeIn();
+                    $('#box2').fadeIn();
+                    $('#box4').fadeIn();
+                    $('#box5').fadeIn();
+                    $('#box6').fadeIn();
+                    });                 
                 }
             };
             checkbox4.onclick = function() {
-                if (checkbox4.checked) {
-                    document.getElementById('chart1').style.display = 'none';
-                    document.getElementById('chart2').style.display = 'none';
-                    document.getElementById('chart3').style.display = 'none';
-                    document.getElementById('chart4').style.display = 'block';
-                    document.getElementById('warningLog1').style.display = 'none';
-                    document.getElementById('warningLog2').style.display = 'none';
-                    document.getElementById('box4').style.display = 'block';
-                    document.getElementById('box2').style.display = 'none';
-                    document.getElementById('box3').style.display = 'none';
-                    document.getElementById('box1').style.display = 'none';
-                    document.getElementById('box5').style.display = 'none';
-                    document.getElementById('box6').style.display = 'none';
-
+                var c4 = $('#chart4');
+                if (checkbox4.checked) {         
+                    c4.animate({
+                        width: '1850px',
+                        height: '730px'
+                    }, 888,function(){
+                        Chart4.resize();
+                    });
+                    $('#chart1').hide();
+                    $('#chart2').hide();
+                    $('#chart3').hide();
+                    $('#warningLog1').hide();
+                    $('#warningLog2').hide();        
+                    $('#box1').hide();
+                    $('#box2').hide();
+                    $('#box3').hide();
+                    $('#box5').hide();
+                    $('#box6').hide();
                 } else {
-                    document.getElementById('chart1').style.display = 'block';
-                    document.getElementById('chart2').style.display = 'block';
-                    document.getElementById('chart3').style.display = 'block';
-                    document.getElementById('chart4').style.display = 'block';
-                    document.getElementById('warningLog1').style.display = 'block';
-                    document.getElementById('warningLog2').style.display = 'block';
-                    document.getElementById('box4').style.display = 'none';
-                    document.getElementById('box2').style.display = 'none';
-                    document.getElementById('box3').style.display = 'none';
-                    document.getElementById('box1').style.display = 'none';
-                    document.getElementById('box5').style.display = 'none';
-                    document.getElementById('box6').style.display = 'none';
-
+                    c4.animate({
+                        width: '612px',
+                        height: '364px'
+                    }, 888,function(){
+                        Chart4.resize();
+                        $('#chart1').fadeIn();
+                    $('#chart2').fadeIn();
+                    $('#chart3').fadeIn();
+                    $('#warningLog1').fadeIn();
+                    $('#warningLog2').fadeIn();                   
+                    $('#box1').fadeIn();
+                    $('#box2').fadeIn();
+                    $('#box3').fadeIn();
+                    $('#box5').fadeIn();
+                    $('#box6').fadeIn();
+                    });
+                    
                 }
+                
             };
             checkbox5.onclick = function() {
                 if (checkbox5.checked) {
-                    document.getElementById('chart1').style.display = 'none';
-                    document.getElementById('chart2').style.display = 'none';
-                    document.getElementById('chart3').style.display = 'none';
-                    document.getElementById('chart4').style.display = 'none';
-                    document.getElementById('warningLog1').style.display = 'none';
-                    document.getElementById('warningLog2').style.display = 'none';
-                    document.getElementById('box5').style.display = 'block';
-                    document.getElementById('box2').style.display = 'none';
-                    document.getElementById('box3').style.display = 'none';
-                    document.getElementById('box4').style.display = 'none';
-                    document.getElementById('box1').style.display = 'none';
-                    document.getElementById('box6').style.display = 'none';
 
                 } else {
-                    document.getElementById('chart1').style.display = 'block';
-                    document.getElementById('chart2').style.display = 'block';
-                    document.getElementById('chart3').style.display = 'block';
-                    document.getElementById('chart4').style.display = 'block';
-                    document.getElementById('warningLog1').style.display = 'block';
-                    document.getElementById('warningLog2').style.display = 'block';
-                    document.getElementById('box5').style.display = 'none';
-                    document.getElementById('box2').style.display = 'none';
-                    document.getElementById('box3').style.display = 'none';
-                    document.getElementById('box4').style.display = 'none';
-                    document.getElementById('box1').style.display = 'none';
-                    document.getElementById('box6').style.display = 'none';
 
                 }
             };
             checkbox6.onclick = function() {
                 if (checkbox6.checked) {
-                    document.getElementById('chart1').style.display = 'none';
-                    document.getElementById('chart2').style.display = 'none';
-                    document.getElementById('chart3').style.display = 'none';
-                    document.getElementById('chart4').style.display = 'none';
-                    document.getElementById('warningLog1').style.display = 'none';
-                    document.getElementById('warningLog2').style.display = 'none';
-                    document.getElementById('box6').style.display = 'block';
-                    document.getElementById('box2').style.display = 'none';
-                    document.getElementById('box3').style.display = 'none';
-                    document.getElementById('box4').style.display = 'none';
-                    document.getElementById('box5').style.display = 'none';
-                    document.getElementById('box1').style.display = 'none';
 
                 } else {
-                    document.getElementById('chart1').style.display = 'block';
-                    document.getElementById('chart2').style.display = 'block';
-                    document.getElementById('chart3').style.display = 'block';
-                    document.getElementById('chart4').style.display = 'block';
-                    document.getElementById('warningLog1').style.display = 'block';
-                    document.getElementById('warningLog2').style.display = 'block';
-                    document.getElementById('box6').style.display = 'none';
-                    document.getElementById('box2').style.display = 'none';
-                    document.getElementById('box3').style.display = 'none';
-                    document.getElementById('box4').style.display = 'none';
-                    document.getElementById('box5').style.display = 'none';
-                    document.getElementById('box1').style.display = 'none';
 
                 }
             };
-
-
-
         };
-    </script>
-    <title>测试图表</title>
-    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
-    <script src="https://cdn.staticfile.org/echarts/5.0.0/echarts.min.js"></script>
-    <script src="wonderland.js"></script>
+    </script> 
 </head>
 
 <body>
-    <h1 align="center">生产线1-工艺数据统计</h1>
-    <div class="box">
-        <div class="boxnav">
-            <form>
-                <div id="checkboxDiv">
-                    <input type="checkbox" name="checkboxName" value="A" id="cboxA" class="form-input" />
-                    <label for=cboxA></label>
-                    <span class="form-input">AAAA图</span>
-                    <input type="checkbox" name="checkboxName" value="B" id="cboxB" class="form-input" />
-                    <label for=cboxB></label>
-                    <span class="form-input">BBBB图</span>
-                    <input type="checkbox" name="checkboxName" value="C" id="cboxC" class="form-input" />
-                    <label for=cboxC></label>
-                    <span class="form-input">CCCC图</span>
-                    <input type="checkbox" name="checkboxName" value="D" id="cboxD" class="form-input" />
-                    <label for=cboxD></label>
-                    <span class="form-input">DDDD图</span>
-                    <input type="checkbox" name="checkboxName" value="E" id="cboxE" class="form-input" />
-                    <label for=cboxE></label>
-                    <span class="form-input">EEEE图</span>
-                    <input type="checkbox" name="checkboxName" value="F" id="cboxF" class="form-input" />
-                    <label for=cboxF></label>
-                    <span class="form-input">FFFF图</span>
+    <div id="wrapper">
+        <div class="overlay"></div>
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" id="sidebar-wrapper">
+            <ul class="nav sidebar-nav">
+                <li class="sidebar-brand"> <a href="#">SPC</a> </li>
+                <li> <a href="index.html">Home</a> </li>
+                <li> <a href="line1.html">生产线1</a> </li>
+                <li> <a href="line2.html">生产线2</a> </li>
+                <li> <a href="line3.html">生产线3</a> </li>
+                <li> <a href="ProcessPublish.html">生产计划下发</a> </li>
+            </ul>
+        </nav>
+        <!-- Sidebar -->
+        
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+          <button type="button" class="hamburger is-closed animated fadeInLeft" data-toggle="offcanvas">
+            <span class="hamb-top"></span>
+            <span class="hamb-middle"></span>
+            <span class="hamb-bottom"></span>
+          </button>
+            <div class="container-fluid">
+            
+                <h1 align="center">生产线1-工艺数据统计</h1>
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <form>
+                            <div id="checkboxDiv">         
+                                <input type="checkbox" name="checkboxName" value="A" id="cboxA" class="form-input" />
+                                <label for=cboxA></label>
+                                <span class="form-input">AAAA图</span>
+                                <input type="checkbox" name="checkboxName" value="B" id="cboxB" class="form-input" />
+                                <label for=cboxB></label>
+                                <span class="form-input">BBBB图</span>
+                                <input type="checkbox" name="checkboxName" value="C" id="cboxC" class="form-input" />
+                                <label for=cboxC></label>
+                                <span class="form-input">CCCC图</span>
+                                <input type="checkbox" name="checkboxName" value="D" id="cboxD" class="form-input" />
+                                <label for=cboxD></label>
+                                <span class="form-input">DDDD图</span>
+                                <input type="checkbox" name="checkboxName" value="E" id="cboxE" class="form-input" />
+                                <label for=cboxE></label>
+                                <span class="form-input">EEEE图</span>
+                                <input type="checkbox" name="checkboxName" value="F" id="cboxF" class="form-input" />
+                                <label for=cboxF></label>
+                                <span class="form-input">FFFF图</span>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="chart1" class="col-md-4 col-sm-4">
+                    </div>
+
+                    <div id="chart2" class="col-md-4 col-sm-4">
+                    </div>
+
+                    <div id="chart3" class="col-md-4 col-sm-4">
+                    </div>
+                    <div id="chart4" class="col-md-4 col-sm-4">
+                    </div>
+
+
+                <div id="efficiency" style="overflow-y:auto;" class="col-md-4 col-sm-4">
+                <div class="panel panel-danger" style="margin-top: 20px;">
+                    <div class="panel-heading">
+                    <h3 class="panel-title">严重危险警报</h3>
+                    </div>
+                    <div class="panel-body" id="warningLog1"></div>
                 </div>
-            </form>
-        </div>
-        <div id="chart1" class="box_style ">
-        </div>
+                </div>
 
-        <div id="chart2" class="box_style ">
-        </div>
+                    <div id="efficiency" style="overflow-y:auto;" class="col-md-4 col-sm-4">
+                        <div class="panel panel-warning" style="margin-top: 20px;">
+                            <div class="panel-heading">
+                            <h3 class="panel-title">潜在危险警报</h3>
+                            </div>
+                            <div class="panel-body" id="warningLog2"></div>
+                        </div>
+                        </div>
 
-        <div id="chart3" class="box_style ">
-        </div>
-        <div id="chart4" class="box_style ">
-        </div>
+                <form id="ChangeInformation" class="col-md-4 col-sm-4" style="text-align:center;">
+                    <p >
+                        <div class="btn-group" > 
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            监控指标 <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                            <li><a href="#">长度</a></li>
+                            <li><a href="#">宽度</a></li>
+                            <li><a href="#">高度</a></li>
+                            <li><a href="#">重量</a></li>
+                            </ul>
+                        </div>
+                        </p>           
+                    <p>
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon3">高位阈值</span>
+                            <input type="text" class="form-control" id="high" aria-describedby="basic-addon3">
+                        </div>
+                    </p>
+                    <p>
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon3">中位阈值</span>
+                            <input type="text" class="form-control" id="average" aria-describedby="basic-addon3">
+                        </div>
+                    </p>
+                    <p>
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon3">低位阈值</span>
+                            <input type="text" class="form-control" id="low" aria-describedby="basic-addon3">
+                        </div>
+                    </p>
+                    <p style="text-align:center;">
+                        <button type="button" class="btn btn-success" onclick="ChangeInformation()">提交</button> 
+                        <button type="button" onclick="Reset()" class="btn btn-warning">重置</button>
+                    </p>
+                </form>
 
+                <div id="efficiency" style="overflow-y:auto;" class="col-md-4 col-sm-4" >
+                <div class="panel panel-primary" style="text-align:center;margin-top: 50px;">
+                    <div class="panel-heading">
+                    <h3 class="panel-title">指标分析</h3>
+                    </div>                
+                    <p style="text-align: center;margin-top: 30px;">
+                    <button class="btn btn-primary" type="button" >
+                        运行效率 <span class="badge" id="eMessage"></span>
+                    </button>
+                    </p>
+                    <p style="text-align: center;">
+                    <button class="btn btn-primary" type="button">
+                        质量分析 <span class="badge" id="eMessage"></span>
+                    </button>
+                    </p>
+                    <p style="text-align: center;">
+                    <button class="btn btn-primary" type="button">
+                        KPI <span class="badge" id="eMessage"></span>
+                    </button>
+                    </p>
+                </div>
+                </div>
 
-
-
-        <!--
-       <div class="box_style ">     
+                <div id="ColChart" class="col-md-4 col-sm-4">
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="box_style ">      
-        </div>
--->
-        <div id="warningLog1" style="overflow-y:auto;" class="box_style ">
-            <p id="DefaultMessage1">严重危险警报：</p>
-        </div>
-        <div id="warningLog2" style="overflow-y:auto;" class="box_style ">
-            <p id="DefaultMessage2">潜在危险警报：</p>
-        </div>
-        <div class="Bigbox_Style" id="box1"></div>
-        <div class="Bigbox_Style" id="box2"></div>
-        <div class="Bigbox_Style" id="box3"></div>
-        <div class="Bigbox_Style" id="box4"></div>
-        <div class="Bigbox_Style" id="box5"></div>
-        <div class="Bigbox_Style" id="box6"></div>
     </div>
-
-
-
-
-
-    <form id="ChangeInformation">
-        <p>
-            高位阈值: <input type="text" id="high" style="display:inline">
-        </p>
-        <p>
-            中位阈值: <input type="text" id="average" style="display:inline">
-        </p>
-        <p>
-            低位阈值: <input type="text" id="low" style="display:inline">
-        </p>
-        <p>
-            <button type="button" onclick="ChangeInformation()">提交</button> <button type="button" onclick="Reset()">重置</button>
-        </p>
-    </form>
-
+    
 
     <script>
         var id = [],
@@ -458,7 +713,7 @@
             weight = [];
 
         function getData() {
-            var url = "http://localhost:8080/sample2";
+            var url = "http://localhost:8080/sample3";
             $.getJSON(url, function(json_data) {
                 id.push(json_data[0]['id']);
                 length.push(json_data[0]['length']);
@@ -535,6 +790,35 @@
             document.getElementById('average').value = "";
         }
 
+        function effCalc(a,b){
+            let value = a * height[height.length - 1] + b;
+            let div = $('#eMessage');
+            //let now = new Date();
+            div.text(value);
+        }
+
+
+        var ColChartoption = {
+            title: {
+                text: '瓶颈工位监测'
+            },
+            xAxis: {
+            type: 'category',
+            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            },
+            yAxis: {
+            type: 'value'
+            },
+            series: [{
+            data: [120, 200, 150, 80, 70, 110, 130],
+            type: 'bar',
+            showBackground: true,
+            backgroundStyle: {
+            color: 'rgba(180, 180, 180, 0.2)'
+             }
+        }]
+    };
+        
         var Chart1option = {
             title: {
                 text: '表格1'
@@ -686,6 +970,7 @@
         setInterval(function() {
             getData();
             judge();
+            effCalc(2,3);
             Chart1.setOption({
                 xAxis: {
                     data: id
@@ -735,6 +1020,9 @@
             });
         }, 1000);
 
+        var Colchart = echarts.init(document.getElementById('ColChart'));
+        Colchart.setOption(ColChartoption);
+
         var Chart1 = echarts.init(document.getElementById('chart1'), 'wonderland');
         Chart1.setOption(Chart1option);
 
@@ -746,6 +1034,7 @@
 
         var Chart4 = echarts.init(document.getElementById('chart4'), 'wonderland');
         Chart4.setOption(Chart4option);
-    </script>
 
+    </script>
 </body>
+</html>

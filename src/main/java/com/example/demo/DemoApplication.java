@@ -13,7 +13,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
 import javax.sql.DataSource;
-
+/*
+ *@Copyright 2021, 高 登 from BUPT, All rights reserved.
+* */
 @SpringBootApplication
 @EnableScheduling
 public class DemoApplication {
@@ -24,6 +26,7 @@ public class DemoApplication {
             @Qualifier("primaryDataSource") DataSource dataSource) {
         return new JdbcTemplate(dataSource);
     }
+    //下列bean未使用，但可用作未来multi-databases扩展
     @Bean(name = "secondaryJdbcTemplate")
     public JdbcTemplate secondaryJdbcTemplate(
             @Qualifier("secondaryDataSource") DataSource dataSource) {
