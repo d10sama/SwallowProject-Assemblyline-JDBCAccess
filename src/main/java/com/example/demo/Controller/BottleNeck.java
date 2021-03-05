@@ -112,7 +112,7 @@ public class BottleNeck {
             for (int i = 1; i < sets.length; i++) {
                 if (count < sets[i]) {
                     count = sets[i];
-                    value = i + 1;
+                    value = i;
                 }
             }
         }catch(Exception e)
