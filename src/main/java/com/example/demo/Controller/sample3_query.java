@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.sql.DataSource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,9 +44,11 @@ public class sample3_query {
     }
     @RequestMapping("/function3")
     @ResponseBody
-    public String fun1() {
+    public Map<String,Object> fun1() {
         String fun1="y=ax+b,a=2,b=3,result = %f";
         double result1=jdbcTemplate1.queryForObject(String.format("select length from sample3 where id=%d",ssn2++),double.class);
-        return String.format(fun1,(result1*2+3));
+        Map<String,Object> tmp=new HashMap<String, Object>();
+        tmp.put(fun1,result1*2+3);
+        return tmp;
     }
 }
