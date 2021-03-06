@@ -4,12 +4,12 @@
 <html lang="zh-CN">
 <head>
     <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"> 
-    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-    <script src="https://cdn.staticfile.org/echarts/5.0.0/echarts.min.js"></script>
-    <script src="wonderland.js"></script>
+    <script src="resource/js/jquery.js"></script>
+    <link rel="stylesheet" href="resource/css/bootstrap.min.css">
+    <link rel="stylesheet" href="resource/css/bootstrap-theme.min.css">
+    <script src="resource/js/bootstrap.min.js"></script>
+    <script src="resource/js/echarts.min.js"></script>
+    <script src="resource/js/wonderland.js"></script>
     <title>生产线1</title>
     
     <style type=text/css>
@@ -696,7 +696,7 @@
 
         function judge() {
             //监测长度时执行
-            if(DataType == 0) {
+            
                 if (length[length.length - 1] > HighestLength) {
                     HigherCountLength++;
                     let position = document.getElementById('warningLog1');
@@ -736,9 +736,9 @@
                     temp.innerText = warningText;
                     position.appendChild(temp);
                 }
-            }
+            
             //监测宽度时执行
-            if(DataType == 1) {
+            
                 if (width[width.length - 1] > HighestWidth) {
                     HigherCountWidth++;
                     let position = document.getElementById('warningLog1');
@@ -778,9 +778,9 @@
                     temp.innerText = warningText;
                     position.appendChild(temp);
                 }
-            }
+            
             //监测高度时执行
-            if(DataType == 2) {
+           
                 if (height[height.length - 1] > HighestHeight) {
                     HigherCountHeight++;
                     let position = document.getElementById('warningLog1');
@@ -820,9 +820,9 @@
                     temp.innerText = warningText;
                     position.appendChild(temp);
                 }
-            }
+            
             //监测重量时执行
-            if(DataType == 3) {
+            
                 if (weight[weight.length - 1] > HighestWeight) {
                     HigherCountWeight++;
                     let position = document.getElementById('warningLog1');
@@ -862,7 +862,7 @@
                     temp.innerText = warningText;
                     position.appendChild(temp);
                 }
-            }
+            
         }
 
         $("#watch_type").change(function () {
@@ -1092,12 +1092,13 @@
                 name: 'id',
                 type: 'category',
                 boundaryGap: false,
-                data: id
+                data: id 
             },
             yAxis: {
                 name: 'value',
                 type: 'value',
                 boundaryGap: [0, '50%'],
+
             },
             series: [{
                 name: '重量',
@@ -1158,6 +1159,7 @@
                     stack: '值'
                 }]
             });
+
             Colchart.setOption({
             series: [{
             data: stastionData,
@@ -1165,7 +1167,6 @@
              }]
         });
         }, 1000);
-
 
         var Colchart = echarts.init(document.getElementById('ColChart'));
         Colchart.setOption(ColChartoption);
@@ -1181,7 +1182,6 @@
 
         var Chart4 = echarts.init(document.getElementById('chart4'), 'wonderland');
         Chart4.setOption(Chart4option);
-
     </script>
 </body>
 </html>

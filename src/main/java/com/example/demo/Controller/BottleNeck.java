@@ -47,7 +47,6 @@ public class BottleNeck {
         {
             e.printStackTrace();
         }
-        System.out.println("pre="+this.presentNum);
         tmp= jdbcTemplate1.queryForList(String.format(template1, this.presentNum));
         return cmp(tmp);
 

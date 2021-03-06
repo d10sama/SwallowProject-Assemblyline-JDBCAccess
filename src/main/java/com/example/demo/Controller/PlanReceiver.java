@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Map;
 
 @ResponseBody
 @Controller
@@ -19,7 +21,7 @@ public class PlanReceiver {
     @Autowired
     @Qualifier("primaryJdbcTemplate")
     private JdbcTemplate jdbcTemplate1;
-    String command="insert into process_plan (line1set1,line1set2,line1set3,line2,line3,startdate,enddate) values (%d,%d,%d,%d,%d,%d,%d);";
+    private static final String command="insert into process_plan (line1set1,line1set2,line1set3,line2,line3,startdate,enddate) values (%d,%d,%d,%d,%d,%d,%d);";
     @RequestMapping(value="/get",method={RequestMethod.POST,RequestMethod.GET})
     public String Adapter(HttpServletRequest request, HttpSession session)
     {
@@ -38,5 +40,12 @@ public class PlanReceiver {
         System.out.println(startdate);
         jdbcTemplate1.execute(String.format(command,line1set1,line1set2,line1set3,line2,line3,startdate,enddate));
         return "success";
+    }
+    private static final String newProcessPlan="select *  from process_plan order by id desc limit 0,1;";
+    @RequestMapping("/newPlan")
+    private List<Map<String,Object>> newPlan()
+    {
+        List<Map<String,Object>> result=jdbcTemplate1.queryForList(newProcessPlan);
+        return result;
     }
 }
