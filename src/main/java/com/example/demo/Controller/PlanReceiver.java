@@ -38,7 +38,9 @@ public class PlanReceiver {
         int startdate=Integer.parseInt(request.getParameter("startdate"));
         int enddate=Integer.parseInt(request.getParameter("enddate"));
         System.out.println(startdate);
+        //执行sql语句
         jdbcTemplate1.execute(String.format(command,line1set1,line1set2,line1set3,line2,line3,startdate,enddate));
+
         return "success";
     }
     private static final String newProcessPlan="select *  from process_plan order by id desc limit 0,1;";

@@ -19,8 +19,6 @@ import java.util.Map;
 @Controller
 @CrossOrigin
 public class sample3_query {
-
-
     private static final String template = "select * from sample3 where id=%d";
     private static int ssn=1;
     private static int ssn2=1;
