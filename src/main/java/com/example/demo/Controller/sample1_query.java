@@ -1,18 +1,13 @@
 package com.example.demo.Controller;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.sql.DataSource;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +33,6 @@ public class sample1_query {
      */
     private static int ssn=1;//该ssn与执行template组合
     private static int ssn2=1;
-    private static long rows;
     private static final String sentence2="select id  from sample1 order by id desc limit 0,1;";
     //选取设定好的主database
     @Autowired
@@ -48,8 +42,7 @@ public class sample1_query {
     @RequestMapping("/sample1")
     @ResponseBody
     public List<Map<String,Object>> contextLoads() {
-        List<Map<String,Object>> result=jdbcTemplate1.queryForList(String.format(template,ssn++));
-        return result;
+        return jdbcTemplate1.queryForList(String.format(template,ssn++));
     }
     //用于返回表中条目数
     @RequestMapping("/sp1rows")
