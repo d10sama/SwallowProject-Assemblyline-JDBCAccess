@@ -17,7 +17,7 @@ import java.util.Map;
 @CrossOrigin
 public class sample3_query {
 
-    private static final String template = "select * from sample3 where id=%d";
+    private static final String template = "select * from sample3 order by id desc limit 0,1;";
     private static int ssn=1;
     private static int ssn2=1;
     private static final String sentence2="select id  from sample3 order by id desc limit 0,1;";
@@ -28,7 +28,7 @@ public class sample3_query {
     @RequestMapping("/sample3")
     @ResponseBody
     public List<Map<String,Object>> contextLoads() {
-        List<Map<String,Object>> result=jdbcTemplate1.queryForList(String.format(template,ssn++));
+        List<Map<String,Object>> result=jdbcTemplate1.queryForList(template);
         return result;
     }
     @RequestMapping("/sp3rows")
