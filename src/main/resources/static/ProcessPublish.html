@@ -106,7 +106,7 @@
                 let input6 = $('#start').val();
                 let input7 = $('#end').val();
                 let url = "http://localhost:8080/get?line1set1="+input1+"&line1set2="+input2+"&line1set3="+input3+"&line2="+input4+"&line3="+input5+"&startdate="+input6+"&enddate="+input7;
-                $('#test').text(url);
+                $('#test').text(url+"已提交");
                 $.ajax(url,{
                     method: 'GET'
                 });
