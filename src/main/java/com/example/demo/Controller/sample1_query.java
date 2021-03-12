@@ -17,7 +17,7 @@ import java.util.Map;
 @CrossOrigin
 public class sample1_query {
 
-    private static final String template = "select * from sample1 where id=%d";
+    private static final String template = "select * from sample1 order by id desc limit 0,1;";
     /*
         ssn,ssn1是为了方便展示而创建的，可以递增返回sql条目，若要返回最新一条，\
 
@@ -42,7 +42,8 @@ public class sample1_query {
     @RequestMapping("/sample1")
     @ResponseBody
     public List<Map<String,Object>> contextLoads() {
-        return jdbcTemplate1.queryForList(String.format(template,ssn++));
+        List<Map<String,Object>> result=jdbcTemplate1.queryForList(template);
+        return result;
     }
     //用于返回表中条目数
     @RequestMapping("/sp1rows")

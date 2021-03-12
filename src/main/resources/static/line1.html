@@ -723,7 +723,7 @@
         stastionData = [0, 0, 0];
 
         function getData() {
-            var url = "http://localhost:8080/sample3";
+            var url = "http://localhost:8080/sample1";
             var station = "http://localhost:8080/l1neck";
             $.getJSON(url, function (json_data) {
                 Chart1.hideLoading();
@@ -736,6 +736,7 @@
                 width.push(json_data[0]['width']);
                 height.push(json_data[0]['height']);
                 weight.push(json_data[0]['weight']);
+
 
                 if (id.length > 7) {
                     id.shift();
@@ -1197,6 +1198,8 @@
 
         setInterval(function () {
             getData();
+            if (id[id.length - 1] == id[id.length - 2])
+                return
             judge();
             effCalc(2, 3);
             Chart1.setOption({
