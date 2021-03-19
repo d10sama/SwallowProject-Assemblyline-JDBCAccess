@@ -47,7 +47,7 @@ public class sample1_query {
     }
     //用于返回表中条目数
     @RequestMapping("/sp1rows")
-    @Scheduled(fixedRate = 500)
+    @Scheduled(fixedRate = 1)
     //refresh info_page for 0.2ms
     public long rows() {
         return jdbcTemplate1.queryForObject(sentence2,long.class);
