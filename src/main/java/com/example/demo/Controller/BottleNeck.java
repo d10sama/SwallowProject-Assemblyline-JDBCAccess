@@ -27,8 +27,8 @@ public class BottleNeck {
     static long OriginNum=0;//记录原始条目数
     long presentNum;//记录当前条目数
     //sql语句
-    String sentence1 = "select id  from line1_sets_time order by id desc limit 0,1;";
-    String template1="select id,set1,set2,set3 from line1_sets_time where id=%d";
+    String sentence1 = "select id  from Product_Table order by id desc limit 0,1;";
+    String template1="select * from Product_Table where id=%d";
     //选取database
     @Autowired
     @Qualifier("primaryJdbcTemplate")
@@ -57,7 +57,7 @@ public class BottleNeck {
     //下同
     String sentence2 = "select id  from line2_sets_time order by id desc limit 0,1;";
 
-    String template2="select id,set1,set2,set3 from line2_sets_time where id=%d";
+    String template2="select * from where id=%d";
     @RequestMapping("/l2neck")
     @Scheduled(fixedRate = 1000)
     public List<Map<String, Object>> content2() {
@@ -76,7 +76,7 @@ public class BottleNeck {
     String sentence3 = "select id  from line3_sets_time order by id desc limit 0,1;";
 
     //下同
-    String template3="select id,set1,set2,set3 from line3_sets_time where id=%d";
+    String template3="select * from Product_Table where id=%d";
     @RequestMapping("/l3neck")
     @Scheduled(fixedRate = 500)
     public List<Map<String, Object>> content3() {
