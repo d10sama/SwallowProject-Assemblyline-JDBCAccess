@@ -28,7 +28,15 @@ public class BottleNeck {
     long presentNum;//记录当前条目数
     //sql语句
     String sentence1 = "select id  from Product_Table order by id desc limit 0,1;";
-    String template1="select * from Product_Table where id=%d";
+    String template1="select  line1_station2_product_time,line1_station3_product_time," +
+            "line1_station4_product_time, " +
+            "line1_station5_product_time, " +
+            "line1_station6_product_time, " +
+            "line1_station7_product_time, " +
+            "line1_station8_product_time, " +
+            "line1_station9_product_time, " +
+            "line1_station10_product_time"+
+            " from Product_Table where id=%d";
     //选取database
     @Autowired
     @Qualifier("primaryJdbcTemplate")
@@ -41,112 +49,56 @@ public class BottleNeck {
         int count=0;
         //创建对象
         List<Map<String, Object>> tmp = null;
-        //尝试对表line1_sets_time执行sql语句，失败则在控制台输出错误信息
         try {
             this.presentNum = jdbcTemplate1.queryForObject(sentence1, long.class);
         }catch (Exception e)
         {
             e.printStackTrace();
         }
-        //让tmp等于sql语句返回的对象
-        tmp= jdbcTemplate1.queryForList(String.format(template1, this.presentNum));
+        try {
+            //让tmp等于sql语句返回的对象
+            tmp = jdbcTemplate1.queryForList(String.format(template1, this.presentNum));
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
         //返回cmp()方法处理过后的tmp
         return cmp(tmp);
-
     }
-    //下同
-    String sentence2 = "select id  from line2_sets_time order by id desc limit 0,1;";
 
-    String template2="select * from where id=%d";
-    @RequestMapping("/l2neck")
-    @Scheduled(fixedRate = 1000)
-    public List<Map<String, Object>> content2() {
+    //data resolver
+    int[] times(List<Map<String,Object>> tmp)
+    {
         int count=0;
-        List<Map<String, Object>> tmp = null;
-        try {
-            this.presentNum = jdbcTemplate1.queryForObject(sentence2, long.class);
-        }catch (Exception e)
+        int[] sets = new int[9];
+        try{
+            for(Map<String,Object> map:tmp)
+                for(String s:map.keySet())
+                {
+                    sets[count++]=Integer.parseInt(map.get(s).toString());
+                }
+        }
+        catch (Exception e)
         {
             e.printStackTrace();
         }
-        //.out.println("pre="+this.presentNum);
-        tmp= jdbcTemplate1.queryForList(String.format(template2, this.presentNum));
-        return cmp(tmp);
+        return sets;
     }
-    String sentence3 = "select id  from line3_sets_time order by id desc limit 0,1;";
-
-    //下同
-    String template3="select * from Product_Table where id=%d";
-    @RequestMapping("/l3neck")
-    @Scheduled(fixedRate = 500)
-    public List<Map<String, Object>> content3() {
-        int count=0;
-        List<Map<String, Object>> tmp = null;
-        try {
-            this.presentNum = jdbcTemplate1.queryForObject(sentence3, long.class);
-        }catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        tmp= jdbcTemplate1.queryForList(String.format(template3, this.presentNum));
-        return cmp(tmp);
-    }
+    
     //cmp方法
     List<Map<String,Object>> cmp(List<Map<String,Object>> tmp)
     {
-        int[] sets;//存数据数组
-        int count=0;//数组大小计数器
-        int value=0;//数组值记录器
-        //计算数组大小
-        for(int i=0;i<tmp.get(0).size();i++)
-            count++;
-
-        sets=new int[count];//为数组new空间
-
-        count=0;//计数器重置
-        //两层for循环取出条目数据并存入sets[]
-        /*
-            特别注意，由于sql语句为select id,......
-            所以数组第一位存储的并不是某个工位的数据，而是id值，而要避免他的方法会在下面提到
-         */
-        try{
-            for (Map<String, Object> map : tmp) {
-                for (String s : map.keySet()) {
-                    sets[count++]=Integer.parseInt(map.get(s).toString());
-                }
-            }
-        }catch(Exception e)
-        {
-            e.printStackTrace();
+        int[] sets=times(tmp);
+        int value=0;
+        int neck=1;
+        for(int i:sets) {
+            value = value < i ? i : value;
+            neck++;
         }
-
-        count=0;//计数器清零
-        /*
-            通过从
-            i=1而不是i=0跳过第一位存放id的
-            若value的值小于数组当前位置的值
-            则value=当前值
-            这样通过时间复杂度为n比较出最大的工位
-            既瓶颈工位
-         */
-        try {
-            for (int i = 1; i < sets.length; i++) {
-                if (count < sets[i]) {
-                    count = sets[i];
-                    value = i;
-                }
-            }
-        }catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-        //创建map对象ADD方便存入tmp中
-        Map<String,Object> ADD=new HashMap<String,Object>();
-        //add中放入标签为“neck”的value值；
-        ADD.put("neck",value);
-        tmp.add(ADD);
-        //返回处理过后的tmp
+        Map<String,Object> map=new HashMap<String,Object>();
+        map.put("neck",neck);
+        tmp.add(map);
         return tmp;
     }
 
