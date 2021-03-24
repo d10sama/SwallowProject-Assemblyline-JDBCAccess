@@ -18,19 +18,7 @@ import java.util.Map;
 public class sample1_query {
 
     private static final String template = "select * from Product_Table order by id desc limit 0,1;";
-    /*
-        ssn,ssn1是为了方便展示而创建的，可以递增返回sql条目，若要返回最新一条，\
 
-        需要做两步
-        1.第一句private static final String template 的sql语句修改为
-        select * from sample1 order by id desc limit 0,1;
-
-        2.将函数contextLoads()修改为
-        public List<Map<String,Object>> contextLoads() {
-        List<Map<String,Object>> result=jdbcTemplate1.queryForList(template);
-        return result;
-    }
-     */
     private static int ssn=1;//该ssn与执行template组合
     private static int ssn2=1;
     private static final String sentence2="select id  from Product_Table order by id desc limit 0,1;";
@@ -40,6 +28,7 @@ public class sample1_query {
     private JdbcTemplate jdbcTemplate1;
     //用于返回表中对象
     @RequestMapping("/sample1")
+    @Scheduled(fixedRate = 1000)//定时1秒
     @ResponseBody
     public List<Map<String,Object>> contextLoads() {
         List<Map<String,Object>> result=jdbcTemplate1.queryForList(template);
