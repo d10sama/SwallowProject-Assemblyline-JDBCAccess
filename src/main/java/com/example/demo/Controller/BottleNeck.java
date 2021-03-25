@@ -46,61 +46,7 @@ public class BottleNeck {
     @RequestMapping("/l1neck")//返回页面
     @Scheduled(fixedRate = 1000)//定时1秒
     public List<Map<String, Object>> content1() {
-        int count=0;
-        //创建对象
-        List<Map<String, Object>> tmp = null;
-        try {
-            this.presentNum = jdbcTemplate1.queryForObject(sentence1, long.class);
-        }catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        try {
-            //让tmp等于sql语句返回的对象
-            tmp = jdbcTemplate1.queryForList(String.format(template1, this.presentNum));
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-        //返回cmp()方法处理过后的tmp
-        return cmp(tmp);
+        return null;
     }
-
-    //data resolver
-    int[] times(List<Map<String,Object>> tmp)
-    {
-        int count=0;
-        int[] sets = new int[9];
-        try{
-            for(Map<String,Object> map:tmp)
-                for(String s:map.keySet())
-                {
-                    sets[count++]=Integer.parseInt(map.get(s).toString());
-                }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        return sets;
-    }
-    
-    //cmp方法
-    List<Map<String,Object>> cmp(List<Map<String,Object>> tmp)
-    {
-        int[] sets=times(tmp);
-        int value=0;
-        int neck=1;
-        for(int i:sets) {
-            value = value < i ? i : value;
-            neck++;
-        }
-        Map<String,Object> map=new HashMap<String,Object>();
-        map.put("neck",neck);
-        tmp.add(map);
-        return tmp;
-    }
-
 
 }

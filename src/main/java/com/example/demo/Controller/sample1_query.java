@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,47 +20,67 @@ public class sample1_query {
 
     private static final String template = "select * from Product_Table order by id desc limit 0,1;";
 
-    private static int ssn=1;//该ssn与执行template组合
-    private static int ssn2=1;
     private static final String sentence2="select id  from Product_Table order by id desc limit 0,1;";
+    String[] NGOK;
+    int preID;
     //选取设定好的主database
     @Autowired
     @Qualifier("primaryJdbcTemplate")
     private JdbcTemplate jdbcTemplate1;
     //用于返回表中对象
-    @RequestMapping("/sample1")
-    @Scheduled(fixedRate = 1000)//定时1秒
+    @RequestMapping("/PD_Table")
+    @Scheduled(fixedRate = 500000)//定时1秒
     @ResponseBody
     public List<Map<String,Object>> contextLoads() {
+        int c=0;
         List<Map<String,Object>> result=jdbcTemplate1.queryForList(template);
+        int count=1;
+        this.NGOK=new String[28];
+        for(Map<String,Object> map:result)
+            for(String s: map.keySet())
+            {
+                if(count>25&&count<54) {
+                    //System.out.println(s+":"+map.get(s).toString()+" "+c);
+                    this.NGOK[c]=map.get(s).toString();
+                    c++;
+                }
+                count++;
+            }
+        /*for(int i=0;i<28;i++)
+            System.out.println(this.NGOK[i]+" "+i);*/
         return result;
     }
     //用于返回表中条目数
     @RequestMapping("/sp1rows")
-    @Scheduled(fixedRate = 1)
+    @Scheduled(fixedRate = 10)
     //refresh info_page for 0.2ms
     public long rows() {
         return jdbcTemplate1.queryForObject(sentence2,long.class);
     }
-    //用于返回所需要的的函数以及函数计算后的数值
-    @RequestMapping("/function1")
-    @ResponseBody
-    public Map<String,Object> fun1() {
-        //函数算式
-        String fun1="y=ax+b,a=2,b=3,result = %f";
-        /*
-            此处执行的sql语句同样是依赖ssnd的递增数据
-            选取的是表中条目的length列
-            拓展方式可以是，改为select * ....
-            并让前端解析选取要展示的某x列
-
-            若要修改为返回最新的一条则将语句改为改为
-             double result1=jdbcTemplate1.queryForObject(String.format("select length from sample1 order by id desc limit 0,1"),double.class);
-         */
-        double result1=jdbcTemplate1.queryForObject(String.format("select * from Product_Table where id=%d",ssn2++),double.class);
-        //同样创建map对象用于返回“以字符串fun1”为标签“计算后的数值”
-        Map<String,Object> tmp=new HashMap<String, Object>();
-        tmp.put(fun1,result1*2+3);
-        return tmp;
+    @RequestMapping("/PASS_OK_NG")
+    public Map<String, Object> qualified()
+    {
+        Map<String,Object> temp=new LinkedHashMap<String,Object>();
+        //若all_ok等于true则跳过判断
+        if(this.NGOK[18]=="true")
+        {
+            temp.put("allok",1);
+        }else {
+            temp.put("allok",0);
+            for (int i = 0; i < 9; i++) {
+                //否则判断(PASS为真且NG为真）的工位
+                if (this.NGOK[i] == "true" && this.NGOK[i + 9] == "true") {
+                    temp.put(String.format("line1_station%d_product_OK", i), 1);
+                }
+            }
+            for (int i = 0; i < 9; i++)
+            {
+                if (this.NGOK[i] == "true" && this.NGOK[i + 19] == "false") {
+                    temp.put(String.format("line1_station%d_product_NG", i), 0);
+                }
+            }
+        }
+        return temp;
     }
+
 }
