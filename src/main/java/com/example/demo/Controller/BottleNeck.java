@@ -68,7 +68,6 @@ public class BottleNeck {
                 {
                     value = tmpvalue;
                     count++;
-                    System.out.println(s+" "+"value="+value+" count="+count);
                 }
             }
             idignore++;

@@ -29,28 +29,32 @@ public class TimeConsume {
     private JdbcTemplate jdbcTemplate1;
 
     @RequestMapping("/recent50")
-    @Scheduled(fixedRate = 1000)
+    @Scheduled(fixedRate = 1000000)
     public LinkedHashMap<String,Object> timeconsume()
     {
         List<Map<String,Object>> result=jdbcTemplate1.queryForList(query50);
         int count=result.size();
         int tmpvalue;
         int times[]=new int[11];
+        int totaltimes=0;//总消耗时间
+        int totalsize=0;//总物件数量
+
         for(int i=0;i<11;i++)
             times[i]=0;
         for(Map<String,Object> map:result) {
             for (String s : map.keySet()) {
-                tmpvalue = Integer.parseInt(map.get(s).toString()) / 10;
+                tmpvalue = Integer.parseInt(map.get(s).toString());
                 times[tmpvalue / 10]++;
+                totaltimes+=tmpvalue;
             }
         }
+        for(int i=0;i<11;i++)
+            totalsize+=times[i];
         LinkedHashMap<String,Object> fin=new LinkedHashMap<String,Object>();
-        int totaltimes=0;
-        for(int i:times)
-            totaltimes+=i;
-        for(int i:times)
+        for(int i=0;i<11;i++)
         {
-            fin.put("0",i/totaltimes);
+            System.out.println("times["+i+"]"+times[i]);
+            fin.put(String.format("%d",i),(double)times[i]/totalsize);
         }
         return fin;
     }
