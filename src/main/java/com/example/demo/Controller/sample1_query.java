@@ -135,13 +135,20 @@ public class sample1_query {
         kpi.put("time_consume",time_conusme);
         return kpi;
     }
+    private final String qualified50="select product_total_OK from Product_Table order by id desc limit 0,50";
     @RequestMapping("/kpi2")
     @Scheduled(fixedRate = 500)
-    public Map<String,Object> KPI2()
+    public List<Map<String,Object>> KPI2()
     {
-        
+        int qualifiedcount=0;
+        List<Map<String,Object>> result=jdbcTemplate1.queryForList(qualified50);
+        for(Map<String,Object> map: result)
+            for(String s: map.keySet())
+            {
+                if(map.get(s).toString()=="true")
+                    qualifiedcount++;
+            }
 
-
-        return null;
+        return result;
     }
 }
