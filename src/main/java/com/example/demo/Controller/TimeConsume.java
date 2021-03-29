@@ -53,7 +53,6 @@ public class TimeConsume {
         LinkedHashMap<String,Object> fin=new LinkedHashMap<String,Object>();
         for(int i=0;i<11;i++)
         {
-            System.out.println("times["+i+"]"+times[i]);
             fin.put(String.format("%d",i),(double)times[i]/totalsize);
         }
         return fin;
