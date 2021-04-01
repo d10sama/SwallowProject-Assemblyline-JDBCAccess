@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+//state_coomunication 在json中0为错误，1为正常
 @ResponseBody
 @Controller
 @CrossOrigin

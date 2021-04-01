@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +53,7 @@ public class sample1_query {
             System.out.println(this.NGOK[i]+" "+i);*/
         return result;
     }
-    //用于返回表中条目数
+    /*//用于返回表中条目数
     @RequestMapping("/sp1rows")
     @Scheduled(fixedRate = 100)
     //refresh info_page for 0.2ms,顺便修改完成产品数
@@ -61,7 +62,7 @@ public class sample1_query {
         long id=jdbcTemplate1.queryForObject(sentence2,long.class);
         jdbcTemplate1.execute(String.format(command_fini,id));
         return id;
-    }
+    }*/
     @RequestMapping("/PASS_OK_NG")
     public Map<String, Object> qualified()
     {
@@ -102,7 +103,7 @@ public class sample1_query {
     //KPI功能:显示单个产品相关数据
     @RequestMapping("/kpi1")
     @Scheduled(fixedRate = 500)
-    public Map<String,Object> KPI1()
+    public List<Map<String,Object>> KPI1()
     {
         LinkedHashMap<String,Object> kpi=new LinkedHashMap<String,Object>();
         String pID=jdbcTemplate1.queryForObject(Select_line_product_Id,String.class);
@@ -133,22 +134,81 @@ public class sample1_query {
         kpi.put("ofmin",ofmin);
         kpi.put("ofsec",ofsec);
         kpi.put("time_consume",time_conusme);
-        return kpi;
-    }
-    private final String qualified50="select product_total_OK from Product_Table order by id desc limit 0,50";
-    @RequestMapping("/kpi2")
-    @Scheduled(fixedRate = 500)
-    public List<Map<String,Object>> KPI2()
-    {
-        int qualifiedcount=0;
-        List<Map<String,Object>> result=jdbcTemplate1.queryForList(qualified50);
-        for(Map<String,Object> map: result)
+        //产品合格率传输
+        /*
+        !!!!!
+        暂定为拧紧合格率=拧紧合格产品数/总个数（040*10+070*10）
+        !!!!!
+         */
+        int qualifiedcount_screw=0;//合格的拧紧数量
+        int qualifiedcount_press=0;//合格的压装数量
+        List<Map<String,Object>> result1=jdbcTemplate1.queryForList(qualified_Screw_station2);//2号位结果
+        List<Map<String,Object>> result2=jdbcTemplate1.queryForList(qualified_Screw_station3);//3号位结果
+        List<Map<String,Object>> result3=jdbcTemplate1.queryForList(qualified_Press);//压装结果
+
+        LinkedHashMap<String,Object> press=new LinkedHashMap<>();//压装数据存储器
+        LinkedHashMap<String,Object> screw=new LinkedHashMap<>();//拧紧数据存储器
+        //读取result1,2,3数据
+        for(Map<String,Object> map: result1)
             for(String s: map.keySet())
             {
-                if(map.get(s).toString()=="true")
-                    qualifiedcount++;
+                if((Boolean) map.get(s)==true)
+                    qualifiedcount_press++;
+
             }
 
-        return result;
+        for(Map<String,Object> map: result2)
+            for(String s: map.keySet())
+            {
+                if((Boolean) map.get(s)==true) {
+                    qualifiedcount_press++;
+                }
+            }
+
+        for(Map<String,Object> map: result3)
+            for(String s: map.keySet())
+            {
+                if( (int)map.get(s)==1) {
+                    qualifiedcount_screw++;
+                }
+            }
+        //获取完成产品数
+        long id=jdbcTemplate1.queryForObject(sentence2,long.class);
+        jdbcTemplate1.execute(String.format(command_fini,id));
+
+        //向map存入数据
+        press.put("press_percent",(double)qualifiedcount_press/id);
+        screw.put("screw_percent",(double)qualifiedcount_screw/(id*80));
+        List<Map<String, Object>> outcome = new LinkedList<>();
+        outcome.add(kpi);
+        outcome.add(press);
+        outcome.add(screw);
+        return outcome ;
     }
+    private final String qualified_Screw_station2=
+            "select line1_station2_product_NG from Product_Table order by id desc limit 0,50";
+    private final String qualified_Screw_station3=
+            "select line1_station3_product_NG from Product_Table order by id desc limit 0,50";
+    private final String qualified_Press="select " +
+            "spc_line1_station040_result_1,"+
+            "spc_line1_station040_result_2,"+
+            "spc_line1_station040_result_3,"+
+            "spc_line1_station040_result_4,"+
+            "spc_line1_station040_result_5,"+
+            "spc_line1_station040_result_6,"+
+            "spc_line1_station040_result_7,"+
+            "spc_line1_station040_result_8,"+
+            "spc_line1_station040_result_9,"+
+            "spc_line1_station040_result_10,"+
+            "spc_line1_station070_result_1,"+
+            "spc_line1_station070_result_2,"+
+            "spc_line1_station070_result_3,"+
+            "spc_line1_station070_result_4,"+
+            "spc_line1_station070_result_5,"+
+            "spc_line1_station070_result_6,"+
+            "spc_line1_station070_result_7,"+
+            "spc_line1_station070_result_8,"+
+            "spc_line1_station070_result_9,"+
+            "spc_line1_station070_result_10"+
+            " from Product_Table order by id desc limit 0,50;";
 }

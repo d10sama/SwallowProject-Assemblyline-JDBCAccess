@@ -36,8 +36,6 @@ public class TimeConsume {
         int count=result.size();
         int tmpvalue;
         int times[]=new int[11];
-        int totaltimes=0;//总消耗时间
-        int totalsize=0;//总物件数量
 
         for(int i=0;i<11;i++)
             times[i]=0;
@@ -45,17 +43,13 @@ public class TimeConsume {
             for (String s : map.keySet()) {
                 tmpvalue = Integer.parseInt(map.get(s).toString());
                 times[tmpvalue / 10]++;
-                totaltimes+=tmpvalue;
             }
         }
-        for(int i=0;i<11;i++)
-            totalsize+=times[i];
         LinkedHashMap<String,Object> fin=new LinkedHashMap<String,Object>();
         for(int i=0;i<11;i++)
         {
-            fin.put(String.format("%d",i),(double)times[i]/totalsize);
+            fin.put(String.format("%d",i),times[i]);
         }
         return fin;
     }
-
 }
