@@ -29,7 +29,7 @@ public class TimeConsume {
     private JdbcTemplate jdbcTemplate1;
 
     @RequestMapping("/recent50")
-    @Scheduled(fixedRate = 1000000)
+    @Scheduled(fixedRate = 500)
     public LinkedHashMap<String,Object> timeconsume()
     {
         List<Map<String,Object>> result=jdbcTemplate1.queryForList(query50);

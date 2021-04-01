@@ -30,7 +30,7 @@ public class State_Table {
 
     @RequestMapping("/states")
     @ResponseBody
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 500)
     public LinkedHashMap<String,Object> contentLoad()
     {
         int count=1;

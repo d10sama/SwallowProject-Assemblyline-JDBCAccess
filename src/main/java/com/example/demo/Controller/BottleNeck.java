@@ -36,7 +36,7 @@ public class BottleNeck {
 
     //compare whether new neck is generated
     @RequestMapping("/l1neck")//返回页面
-    @Scheduled(fixedRate = 100000)//定时1秒
+    @Scheduled(fixedRate = 500)//定时0.5秒
     public Map<String, Object> content1() {
         int count=1;
         LinkedHashMap<String,Object> temp=new LinkedHashMap<String,Object>();
