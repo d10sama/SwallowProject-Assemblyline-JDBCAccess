@@ -16,8 +16,10 @@ import java.util.*;
 @Controller
 @CrossOrigin
 public class divertion {
-
-    private final String torque040070="select id,spc_line1_station040_torque_1," +
+    //从数据库中读取
+    private final String torque040070="select id," +
+            "line_product_Id,"+
+            "spc_line1_station040_torque_1," +
             "spc_line1_station040_torque_2,"+
             "spc_line1_station040_torque_3,"+
             "spc_line1_station040_torque_4,"+
@@ -36,26 +38,69 @@ public class divertion {
             "spc_line1_station070_torque_7,"+
             "spc_line1_station070_torque_8,"+
             "spc_line1_station070_torque_9,"+
-            "spc_line1_station070_torque_10"+
+            "spc_line1_station070_torque_10,"+
+            "spc_line1_station010_pressdata_1,"+
+            "spc_line1_station010_displacementdata_1,"+
+            "spc_line1_station010_pressdata_2,"+
+            "spc_line1_station010_displacementdata_2,"+
+            "spc_line1_station010_pressdata_3,"+
+            "spc_line1_station010_displacementdata_3,"+
+            "spc_line1_station010_pressdata_4,"+
+            "spc_line1_station010_displacementdata_4,"+
+            "spc_line1_station020_pressdata_1,"+
+            "spc_line1_station020_displacementdata_1,"+
+            "spc_line1_station020_pressdata_2,"+
+            "spc_line1_station020_displacementdata_2,"+
+            "spc_line1_station020_pressdata_3,"+
+            "spc_line1_station020_displacementdata_3,"+
+            "spc_line1_station020_pressdata_4,"+
+            "spc_line1_station020_displacementdata_4"+
             " from Product_Table order by id desc limit 0,1;";
-
+    //期望值记录
+    int[] TorqueExpectation={240,325};
+    int[] PressureExpectation={0,0,0};
+    /*
+        期望值运算，要减去的数值取决于productid编号，只有040诱导轮是减去325，其他都是240！
+     */
     //选取设定好的主database
     @Autowired
     @Qualifier("primaryJdbcTemplate")
     private JdbcTemplate jdbcTemplate1;
 
+    /*
+    伺服压机工位的压力值偏移量、
+    伺服压机工位的位移值、
+    液压机工位的压力值偏移量、
+    液压机工位的位移值；已获取
 
-    @RequestMapping("/screw_diversion")
+    其中压力值有给定的预期值，
+    和扭矩一样，以一个数组存储，内容是：
+        产品类型号+不同工位的预期压力值；位移参数没有预期值
+     */
+
+    @RequestMapping("/diversion")
     @Scheduled(fixedRate = 500)
     public List<LinkedHashMap<String,Object>> SD()
     {
-        //float数组初始化
+        //变量创建
         float[] torques=new float[20];
+
+        float[] sta010Press=new float[4];
+        int s1pcount=0;
+        float[] sta020Press=new float[4];
+        int s2pcount=0;
+        float[] sta010Disp=new float[4];
+        int s1dcount=0;
+        float[] sta020Disp=new float[4];
+        int s2dcount=0;
+
         int count=0;
+        int ProductIdCount=0;
         float torque_sum1=0.0f;
         int pos_not_zero1=0;
         float torque_sum2=0.0f;
         int pos_not_zero2=0;
+        String productid="#";
         int id=0;
         //数组存扭矩
         List<Map<String,Object>> result=jdbcTemplate1.queryForList(torque040070);
@@ -65,8 +110,37 @@ public class divertion {
                 if(id==0) {
                     id = Integer.parseInt(map.get(s).toString());
                 }
-                else
-                    torques[count++]=Float.parseFloat(map.get(s).toString());
+                else if(id!=0&&ProductIdCount==0)
+                {
+                    productid=map.get(s).toString();
+                    ProductIdCount++;
+                }else if(count<20){
+                    torques[count++] = Float.parseFloat(map.get(s).toString());
+                }else {
+                    //20~27是010，20，22，24，26是压装数值，21，23，25，27是位移数值
+                    if (count < 28 && ((count & 1) == 0))
+                    {
+                        sta010Press[s1pcount++]=Float.parseFloat(map.get(s).toString());
+                        //
+                    }
+                    else if(count < 28 && ((count & 1)== 1))
+                    {
+                        sta010Disp[s1dcount++]=Float.parseFloat(map.get(s).toString());
+                        //
+                    }
+                    //28及以上是020，28，30，32，34是压装数值，29，31，33，35是位移数值
+                    else if(count > 27 && ((count & 1) == 0))
+                    {
+                        sta020Press[s2pcount++]=Float.parseFloat(map.get(s).toString());
+                        //
+                    }
+                    else if(count > 27 && ((count & 1) == 1))
+                    {
+                        sta020Disp[s2dcount++]=Float.parseFloat(map.get(s).toString());
+                        //
+                    }
+                    count++;
+                }
             }
         //torque数据减去预期值
         for(int i=0;i<20;i++) {
@@ -82,12 +156,30 @@ public class divertion {
                 torque_sum2+=torques[i];
             }
         }
+        //press减去预期值后平均
+        /*
+
+
+         */
+        //位移平均值
+        float sta010sum=0f,sta020sum=0f;
+        for(int i=0;i<4;i++) {
+            sta010sum+=sta010Disp[i];
+            sta020sum+=sta020Disp[i];
+        }
         List<LinkedHashMap<String,Object>> outcome=new LinkedList<>();
         LinkedHashMap<String,Object> torqueMap=new LinkedHashMap<>();
+        LinkedHashMap<String,Object> Pre_DisMap=new LinkedHashMap<>();
         torqueMap.put("id",id);
+        torqueMap.put("productid",productid);
         torqueMap.put("avg_torque_diversion040",(float)torque_sum1/pos_not_zero1);
         torqueMap.put("avg_torque_diversion070",(float)torque_sum1/pos_not_zero1);
+        //Pre_DisMap.put("")
+        Pre_DisMap.put("avg_010_dis",(float)sta010sum/4);
+        Pre_DisMap.put("avg_020_dis",(float)sta020sum/4);
+
         outcome.add(torqueMap);
+        outcome.add(Pre_DisMap);
         return outcome;
     }
 
