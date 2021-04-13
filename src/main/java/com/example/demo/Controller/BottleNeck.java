@@ -28,7 +28,14 @@ public class BottleNeck {
     static long OriginNum=0;//记录原始条目数
     long presentNum;//记录当前条目数
     //sql语句
-    String sentence1 = "select *  from Product_Table order by id desc limit 0,1;";
+    String sentence1 = "select ID,line1_station2_product_time," +
+            "line1_station3_product_time,"+
+            "line1_station4_product_time,"+
+            "line1_station5_product_time,"+
+            "line1_station7_product_time,"+
+            "line1_station8_product_time,"+
+            "line1_station10_product_time"+
+            "  from Product_Table order by id desc limit 0,1;";
     //选取database
     @Autowired
     @Qualifier("primaryJdbcTemplate")
@@ -45,11 +52,13 @@ public class BottleNeck {
             for(String s: map.keySet())
             {
                 if(count==1)
-                {temp.put(s,map.get(s).toString());}
-                if(count>=16&&count<=22) {
+                {
+                    temp.put(s,map.get(s).toString());
+                    count++;
+                }
+                else{
                     temp.put(s,map.get(s).toString());
                 }
-                count+=1;
             }
         return cmp(temp);
     }
@@ -59,6 +68,7 @@ public class BottleNeck {
         int idignore=0;
         int value=0;
         int tmpvalue;
+        String name;
         final String Neck="Neck";
         for(String s:tmp.keySet())
         {
@@ -73,20 +83,15 @@ public class BottleNeck {
             idignore++;
         }
 
-        switch (count)
+        if(count<5)
+        { }
+        else if(count==6||count==7)
         {
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-                break;
-            case 6:
-            case 7:
-                count++;
-                break;
-            case 8:
-                count+=2;
-                break;
+            count++;
+        }
+        else if(count==8)
+        {
+            count+=2;
         }
         tmp.put(Neck,count);
         return tmp;
