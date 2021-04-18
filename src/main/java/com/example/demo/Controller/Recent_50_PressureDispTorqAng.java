@@ -150,18 +150,57 @@ public class Recent_50_PressureDispTorqAng {
         for(Map<String,Object> map:resultP)
             for(String s:map.keySet())
             {
-
+                if(Float.parseFloat(map.get(s).toString())!=0f)
+                {
+                    tmpval=Float.parseFloat(map.get(s).toString());
+                    //System.out.println(s+map.get(s).toString());
+                    //最大值记录
+                    if(Dtopcount==0) {
+                        Dup=tmpval;
+                        Dtopcount++;
+                    }
+                }//当前值等于0，则上次记录的tmpval为最小值，故记录后即可退出
+                else {
+                    Ddown = tmpval;
+                    break;
+                }
             }
         //解析结果，对于8*50我固定以差值200为一个饼图的间距（既（上限-下限）/8并且统计每段的数量值）
         for(Map<String,Object> map:resultP)
             for(String s:map.keySet())
             {
-
+                if(Float.parseFloat(map.get(s).toString())!=0f)
+                {
+                    tmpval=Float.parseFloat(map.get(s).toString());
+                    //System.out.println(s+map.get(s).toString());
+                    //最大值记录
+                    if(Ttopcount==0) {
+                        Tup=tmpval;
+                        Ttopcount++;
+                    }
+                }//当前值等于0，则上次记录的tmpval为最小值，故记录后即可退出
+                else {
+                    Tdown = tmpval;
+                    break;
+                }
             }
         for(Map<String,Object> map:resultP)
             for(String s:map.keySet())
             {
-                //System.out.println(s+map.get(s).toString());
+                if(Float.parseFloat(map.get(s).toString())!=0f)
+                {
+                    tmpval=Float.parseFloat(map.get(s).toString());
+                    //System.out.println(s+map.get(s).toString());
+                    //最大值记录
+                    if(Atopcount==0) {
+                        Aup=tmpval;
+                        Atopcount++;
+                    }
+                }//当前值等于0，则上次记录的tmpval为最小值，故记录后即可退出
+                else {
+                    Adown = tmpval;
+                    break;
+                }
             }
 
 
