@@ -51,6 +51,7 @@ public class BottleNeck {
         for(Map<String, Object> map:result)
             for(String s: map.keySet())
             {
+
                 if(count==1)
                 {
                     temp.put(s,map.get(s).toString());
@@ -64,36 +65,35 @@ public class BottleNeck {
     }
     private LinkedHashMap<String,Object> cmp(LinkedHashMap<String,Object> tmp)
     {
-        int count=2;
         int idignore=0;
         int value=0;
+        String neckname="";
         int tmpvalue;
         String name;
         final String Neck="Neck";
+        //读取Map中的数据
         for(String s:tmp.keySet())
         {
             if(idignore!=0) {
                 tmpvalue=Integer.parseInt(tmp.get(s).toString());
-                if(value<tmpvalue)
+                //每当最大值小于当前读取的值，则将瓶颈位置替换为当前名字
+                if(value<=tmpvalue)
                 {
                     value = tmpvalue;
-                    count++;
+                    neckname=s;
                 }
             }
             idignore++;
         }
-
-        if(count<5)
-        { }
-        else if(count==6||count==7)
-        {
-            count++;
-        }
-        else if(count==8)
-        {
-            count+=2;
-        }
-        tmp.put(Neck,count);
+        //下面这句话证明对于station10以外的位置，charat(14)为"_",
+        //System.out.println(neckname+":"+neckname.charAt(14));
+        if(neckname.charAt(14)=='_')
+            neckname=new String(""+neckname.charAt(13));
+        else if(neckname.charAt(14)=='0')
+            neckname="10";
+        else
+            neckname="error";
+        tmp.put(Neck,neckname);
         return tmp;
     }
 

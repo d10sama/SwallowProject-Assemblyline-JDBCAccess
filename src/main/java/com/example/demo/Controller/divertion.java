@@ -157,10 +157,27 @@ public class divertion {
             }
         }
         //press减去预期值后平均
-        /*
-
-
-         */
+        /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //注意事項：
+        //pressの設定値はまだ確認されていなっかだ、
+        //予想の設定値は１１４５１４と思います。
+        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+        float sta010PressSum=0f,sta020PressSum=0f;
+        int pos_not_zero010=0,pos_not_zero020=0;
+        for(int i=0;i<3;i++)
+        {
+            if(sta010Press[i]!=0)
+            {
+                sta010Press[i] -= 114514;
+                pos_not_zero010++;
+                sta010PressSum+=sta010Press[i];
+            }
+            if(sta020Press[i]!=0) {
+                sta020Press[i] -= 114514;
+                pos_not_zero020++;
+                sta020PressSum+=sta020Press[i];
+            }
+        }
         //位移平均值
         float sta010sum=0f,sta020sum=0f;
         for(int i=0;i<4;i++) {
@@ -170,13 +187,17 @@ public class divertion {
         List<LinkedHashMap<String,Object>> outcome=new LinkedList<>();
         LinkedHashMap<String,Object> torqueMap=new LinkedHashMap<>();
         LinkedHashMap<String,Object> Pre_DisMap=new LinkedHashMap<>();
+
         torqueMap.put("id",id);
         torqueMap.put("productid",productid);
         torqueMap.put("avg_torque_diversion040",(float)torque_sum1/pos_not_zero1);
         torqueMap.put("avg_torque_diversion070",(float)torque_sum1/pos_not_zero1);
-        //Pre_DisMap.put("")
+
         Pre_DisMap.put("avg_010_dis",(float)sta010sum/4);
         Pre_DisMap.put("avg_020_dis",(float)sta020sum/4);
+        Pre_DisMap.put("avg_010_press",(float)sta010PressSum/pos_not_zero010);
+        Pre_DisMap.put("avg_020_press",(float)sta020PressSum/pos_not_zero020);
+
 
         outcome.add(torqueMap);
         outcome.add(Pre_DisMap);

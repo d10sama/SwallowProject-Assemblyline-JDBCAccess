@@ -110,7 +110,6 @@ public class sample1_query {
     public LinkedHashMap<String, Object> Adapter()//HttpServletRequest request, HttpSession session)
     {
         int qualified=0, completed=0;
-
         List<Map<String,Object>> result=jdbcTemplate1.queryForList("select product_total_ok from Product_Table");
         int count=1;
         this.temp=new LinkedHashMap<String,Object>();
