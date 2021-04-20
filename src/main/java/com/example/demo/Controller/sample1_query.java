@@ -25,7 +25,7 @@ public class sample1_query {
 
     private static final String sentence2="select id  from Product_Table order by id desc limit 0,1;";
 
-    LinkedHashMap<String,Object> temp;
+    LinkedHashMap<String,Object> temp=new LinkedHashMap<String,Object>();;
 
     final private String Select_line_product_Id="select line_product_Id from Product_Table order by id desc limit 0,1;";
     final private String getOnlineYear="select online_time_year from Product_Table order by id desc limit 0,1;";
@@ -85,7 +85,7 @@ public class sample1_query {
         int c=0;
         List<Map<String,Object>> result=jdbcTemplate1.queryForList(template);
         int count=1;
-        this.temp=new LinkedHashMap<String,Object>();
+        this.temp.clear();
         for(Map<String,Object> map:result)
             for(String s: map.keySet())
             {
@@ -101,7 +101,7 @@ public class sample1_query {
     @RequestMapping("/PASS_OK_NG")
     public Map<String, Object> qualified()
     {
-        return this.temp;
+            return this.temp;
     }
 
     @RequestMapping(value="/qualified")//,method={RequestMethod.POST,RequestMethod.GET})
