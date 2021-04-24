@@ -96,11 +96,11 @@ public class Recent_50_PressureDispTorqAng {
                     "            order by spc_line1_station040_angle_1 desc limit 0,1000;";
 
     @RequestMapping("/PDTA")
-    @Scheduled(fixedRate = 500000)
-    public LinkedHashMap<String,Integer> pdta()
+    @Scheduled(fixedRate = 500)
+    public LinkedList<String> pdta()
     {
 
-        LinkedHashMap<String,Integer> ans=new LinkedHashMap<>();
+        LinkedList<String> ans=new LinkedList<>();
         //P
         LinkedList<Float> p=new LinkedList<>();
         //D
@@ -145,7 +145,7 @@ public class Recent_50_PressureDispTorqAng {
                 }//当前值等于0，则上次记录的tmpval为最小值，故记录后即可退出
 
             }
-        for(Map<String,Object> map:resultD)
+        for(Map<String,Object> map:resultD)gi
             for(String s:map.keySet())
             {
                 if(Float.parseFloat(map.get(s).toString())!=0f)
@@ -234,16 +234,45 @@ public class Recent_50_PressureDispTorqAng {
                         break;
                 }
             }
+            Float p1,p2,d1,d2,t1,t2,a1,a2;
+            Integer p3,t3,d3,a3;
+            LinkedList<String> result=new LinkedList<>();
+
             //向ans中循环插入结果
             for(int i=0;i<7;i++)
             {
-                ans.put(String.format(new String("P%s~%s"),(Pup-Ppartition*i),(Pup-Ppartition*(i+1))),PCOUNT[i]);
-                ans.put(String.format(new String("D%s~%s"),(Dup-Dpartition*i),(Dup-Dpartition*(i+1))),DCOUNT[i]);
-                ans.put(String.format(new String("T%s~%s"),(Tup-Tpartition*i),(Tup-Tpartition*(i+1))),TCOUNT[i]);
-                ans.put(String.format(new String("A%s~%s"),(Aup-Apartition*i),(Aup-Apartition*(i+1))),ACOUNT[i]);
+                p1=(Pup-Ppartition*i);
+                p2=(Pup-Ppartition*(i+1));
+                p3=PCOUNT[i];
+                result.add("p");
+                result.add(p1.toString());
+                result.add(p2.toString());
+                result.add(p3.toString());
+
+                d1=(Dup-Dpartition*i);
+                d2=(Dup-Dpartition*(i+1));
+                d3=DCOUNT[i];
+                result.add("d");
+                result.add(d1.toString());
+                result.add(d2.toString());
+                result.add(d3.toString());
+
+                t1=(Tup-Tpartition*i);
+                t2=(Tup-Tpartition*(i+1));
+                t3=TCOUNT[i];
+                result.add("t");
+                result.add(t1.toString());
+                result.add(t2.toString());
+                result.add(t3.toString());
+
+                a1=(Aup-Apartition*i);
+                a2=(Aup-Apartition*(i+1));
+                a3=ACOUNT[i];
+                result.add("a");
+                result.add(a1.toString());
+                result.add(a2.toString());
+                result.add(a3.toString());
             }
-        return ans;
+        return result;
     }
-
-
 }

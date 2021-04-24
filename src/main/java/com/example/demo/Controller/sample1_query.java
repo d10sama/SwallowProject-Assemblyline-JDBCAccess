@@ -23,9 +23,36 @@ public class sample1_query {
 
     private static final String template = "select * from Product_Table order by id desc limit 0,1;";
 
+    private static final String PASSOKNG ="select id," +//1
+            "line1_station2_product_bypass," +//2
+            "line1_station3_product_bypass," +//3
+            "line1_station4_product_bypass," +//4
+            "line1_station5_product_bypass," +//5
+            "line1_station7_product_bypass," +//6
+            "line1_station8_product_bypass," +//7
+            "line1_station10_product_bypass,"+//8
+            "line1_station2_product_OK,"+//9
+            "line1_station3_product_OK,"+//0
+            "line1_station4_product_OK,"+//1
+            "line1_station5_product_OK,"+//2
+            "line1_station7_product_OK,"+//3
+            "line1_station8_product_OK,"+//4
+            "line1_station10_product_OK,"+//5
+            "product_total_OK,"+//6
+            "line1_station2_product_NG,"+//7
+            "line1_station3_product_NG,"+//8
+            "line1_station4_product_NG," +//9
+            "line1_station5_product_NG," +//0
+            "line1_station7_product_NG," +//1
+            "line1_station8_product_NG," +//2
+            "line1_station10_product_NG "+//3
+    " from Product_Table order by id desc limit 0,1;";//
+
+
+
     private static final String sentence2="select id  from Product_Table order by id desc limit 0,1;";
 
-    LinkedHashMap<String,Object> temp=new LinkedHashMap<String,Object>();;
+
 
     final private String Select_line_product_Id="select line_product_Id from Product_Table order by id desc limit 0,1;";
     final private String getOnlineYear="select online_time_year from Product_Table order by id desc limit 0,1;";
@@ -85,23 +112,39 @@ public class sample1_query {
         int c=0;
         List<Map<String,Object>> result=jdbcTemplate1.queryForList(template);
         int count=1;
-        this.temp.clear();
-        for(Map<String,Object> map:result)
-            for(String s: map.keySet())
-            {
-                if(count==1)
-                    this.temp.put(s,map.get(s).toString());
-                if(count>25&&count<54) {
-                    this.temp.put(s,map.get(s).toString());
-                }
-                count++;
-            }
         return result;
     }
     @RequestMapping("/PASS_OK_NG")
-    public Map<String, Object> qualified()
+    public LinkedHashMap<String,String> qualified()
     {
-            return this.temp;
+        LinkedHashMap<String,String> ans=new LinkedHashMap<String,String>();
+
+        boolean allok=false;
+        int id=0;
+        int count=0;
+        List<Map<String,Object>> result=jdbcTemplate1.queryForList(PASSOKNG);
+
+        for(Map<String,Object> map:result)
+            for(String s:map.keySet())
+            {
+                if(id==0)
+                    ans.put(s,map.get(s).toString());
+                else if(count<7)
+                    ans.put(s,map.get(s).toString());
+                else if(count>6&&count<14)
+                    ans.put(s,map.get(s).toString());
+                else if(count==14)
+                    allok=Integer.parseInt(map.get(s).toString())==1?true:false;
+                else
+                    ans.put(s,map.get(s).toString());
+            }
+
+        if(allok)
+            ans.put("allok","1");
+        else
+            ans.put("allok","0");
+
+        return ans;
     }
 
     @RequestMapping(value="/qualified")//,method={RequestMethod.POST,RequestMethod.GET})
@@ -112,7 +155,7 @@ public class sample1_query {
         int qualified=0, completed=0;
         List<Map<String,Object>> result=jdbcTemplate1.queryForList("select product_total_ok from Product_Table");
         int count=1;
-        this.temp=new LinkedHashMap<String,Object>();
+        LinkedHashMap<String,Object> temp=new LinkedHashMap<String,Object>();
         for(Map<String,Object> map:result)
             for(String s: map.keySet())
             {
