@@ -145,7 +145,7 @@ public class Recent_50_PressureDispTorqAng {
                 }//当前值等于0，则上次记录的tmpval为最小值，故记录后即可退出
 
             }
-        for(Map<String,Object> map:resultD)gi
+        for(Map<String,Object> map:resultD)
             for(String s:map.keySet())
             {
                 if(Float.parseFloat(map.get(s).toString())!=0f)
