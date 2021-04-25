@@ -204,12 +204,13 @@ public class Recent_50_PressureDispTorqAng {
             Atopcount=0;
             //区间内数量统计
             for(int i=0;i<7;i++) {
-                //System.out.println("P"+p.get(Ptopcount)+"small "+(Pup-Ppartition*(i+1))+"big "+(Pup-Ppartition*i));
-                while(p.get(Ptopcount)>=(Pup-Ppartition*(i+1))&&p.get(Ptopcount)<=(Pup-Ppartition*i))
+                if(Ptopcount>=p.size()||Dtopcount>=d.size()||Ttopcount>=t.size()||Atopcount>=a.size())
+                    break;
+                while (p.get(Ptopcount) >= (Pup - Ppartition * (i + 1)) && p.get(Ptopcount) <= (Pup - Ppartition * i))
                 {
                     PCOUNT[i]++;
                     Ptopcount++;
-                    if(Ptopcount>=p.size())
+                    if (Ptopcount >= p.size())
                         break;
                 }
                 while(d.get(Dtopcount)>=(Dup-Dpartition*(i+1))&&d.get(Dtopcount)<=(Dup-Dpartition*i))
