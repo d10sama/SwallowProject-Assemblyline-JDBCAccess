@@ -33,6 +33,8 @@ public class BoundSaver {
         SL=Integer.parseInt(request.getParameter("SL"));
         PU=Integer.parseInt(request.getParameter("PU"));
         PL=Integer.parseInt(request.getParameter("PL"));
+        //System.out.println(SU+" "+SL+" "+PU+" "+PL);
+        //拼接为string存入
         String SPrec=SU.toString()+" "+SL.toString()+" "+PU.toString()+" "+PL.toString()+" ";
         byte[] ins=SPrec.getBytes();
         if(!BoundRecorder.exists())
@@ -65,23 +67,31 @@ public class BoundSaver {
         String str="";
         int tmpval=0;
         int namecount=0;
+        boolean neg=false;
         String[] NameSet={"SU","SL","PU","PL"};
         if (BoundRecorder.exists()) {
             try {
+                //建立读取通道
                 FileReader fr=new FileReader(BoundRecorder);
                 BufferedReader br=new BufferedReader(fr);
                 str=br.readLine();
-
+                //System.out.println(str);
+                //循环读数字，解析数据
                 for(int i=0;i<str.length()&&namecount<=3;i++)
                 {
                     if(str.charAt(i)!=' ')
                     {
+                        if(str.charAt(i)=='-')
+                        {neg=true;}
+                        else{
                         tmpval=tmpval*10+(str.charAt(i)-'0');
-                        System.out.println(tmpval);
+                        //System.out.println(tmpval);
+                        }
                     }
                     else{
                         //存入阈值记录
-                        System.out.println(tmpval);
+                        tmpval=neg?-tmpval:tmpval;
+                        neg=false;
                         ans.put(NameSet[namecount++],tmpval);
                         tmpval=0;
                     }

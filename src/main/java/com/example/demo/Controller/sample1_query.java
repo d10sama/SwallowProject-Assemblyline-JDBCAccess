@@ -23,29 +23,29 @@ public class sample1_query {
 
     private static final String template = "select * from Product_Table order by id desc limit 0,1;";
 
-    private static final String PASSOKNG ="select id," +//1
-            "line1_station2_product_bypass," +//2
+    private static final String PASSOKNG ="select id," +
+            "line1_station2_product_bypass," +//0
+            "line1_station2_product_OK,"+//1
+            "line1_station2_product_NG,"+//2
             "line1_station3_product_bypass," +//3
-            "line1_station4_product_bypass," +//4
-            "line1_station5_product_bypass," +//5
-            "line1_station7_product_bypass," +//6
-            "line1_station8_product_bypass," +//7
-            "line1_station10_product_bypass,"+//8
-            "line1_station2_product_OK,"+//9
-            "line1_station3_product_OK,"+//0
-            "line1_station4_product_OK,"+//1
-            "line1_station5_product_OK,"+//2
+            "line1_station3_product_OK,"+//4
+            "line1_station3_product_NG,"+//5
+            "line1_station4_product_bypass," +//6
+            "line1_station4_product_OK,"+//7
+            "line1_station4_product_NG," +//8
+            "line1_station5_product_bypass," +//9
+            "line1_station5_product_OK,"+//0
+            "line1_station5_product_NG," +//1
+            "line1_station7_product_bypass," +//2
             "line1_station7_product_OK,"+//3
-            "line1_station8_product_OK,"+//4
-            "line1_station10_product_OK,"+//5
-            "product_total_OK,"+//6
-            "line1_station2_product_NG,"+//7
-            "line1_station3_product_NG,"+//8
-            "line1_station4_product_NG," +//9
-            "line1_station5_product_NG," +//0
-            "line1_station7_product_NG," +//1
-            "line1_station8_product_NG," +//2
-            "line1_station10_product_NG "+//3
+            "line1_station7_product_NG," +//4
+            "line1_station8_product_bypass," +//5
+            "line1_station8_product_OK,"+//6
+            "line1_station8_product_NG," +//7
+            "line1_station10_product_bypass,"+//8
+            "line1_station10_product_OK,"+//9
+            "line1_station10_product_NG, "+//0
+            "product_total_OK"+//1
     " from Product_Table order by id desc limit 0,1;";//
 
 
@@ -118,8 +118,12 @@ public class sample1_query {
     public LinkedHashMap<String,String> qualified()
     {
         LinkedHashMap<String,String> ans=new LinkedHashMap<String,String>();
-
-        boolean allok=false;
+        //allok逻辑：如果工位启用（0）且ok等于1且NG==0则算一个ok
+        //要么工位未启用，跳过
+        //要么就allok为false
+        boolean allok=true;
+        boolean StaInuse=false;//当前sta是否inuse
+        boolean isOK=false;
         int id=0;
         int count=0;
         List<Map<String,Object>> result=jdbcTemplate1.queryForList(PASSOKNG);
@@ -127,17 +131,37 @@ public class sample1_query {
         for(Map<String,Object> map:result)
             for(String s:map.keySet())
             {
-                if(id==0)
+                if(id==0) {
                     ans.put(s,map.get(s).toString());
-                else if(count<7)
-                    ans.put(s,map.get(s).toString());
-                else if(count>6&&count<14)
-                    ans.put(s,map.get(s).toString());
-                else if(count==14)
-                    allok=Integer.parseInt(map.get(s).toString())==1?true:false;
-                else
-                    ans.put(s,map.get(s).toString());
+                    continue;
+                }
+                ans.put(s,map.get(s).toString());
+                if(allok)
+                    switch (count%3)
+                    {
+                        case 0:
+                            if(Integer.parseInt(map.get(s).toString())==0)
+                                StaInuse=true;
+                            break;
+                        case 1:
+                            if(StaInuse&&(Integer.parseInt(map.get(s).toString())==1))
+                                isOK=true;
+                            else
+                                allok=false;
+                            break;
+                        case 2:if(StaInuse&&isOK&&(Integer.parseInt(map.get(s).toString())==0))
+                                {
+                                    StaInuse=false;
+                                    isOK=false;
+                                }else
+                                {
+                                    allok=false;
+                                }
+                            break;
+                    }
+                count++;
             }
+
 
         if(allok)
             ans.put("allok","1");
