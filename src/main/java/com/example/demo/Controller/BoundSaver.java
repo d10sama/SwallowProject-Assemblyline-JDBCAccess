@@ -33,7 +33,6 @@ public class BoundSaver {
         SL=Integer.parseInt(request.getParameter("SL"));
         PU=Integer.parseInt(request.getParameter("PU"));
         PL=Integer.parseInt(request.getParameter("PL"));
-        //System.out.println(SU+" "+SL+" "+PU+" "+PL);
         //拼接为string存入
         String SPrec=SU.toString()+" "+SL.toString()+" "+PU.toString()+" "+PL.toString()+" ";
         byte[] ins=SPrec.getBytes();
@@ -75,7 +74,6 @@ public class BoundSaver {
                 FileReader fr=new FileReader(BoundRecorder);
                 BufferedReader br=new BufferedReader(fr);
                 str=br.readLine();
-                //System.out.println(str);
                 //循环读数字，解析数据
                 for(int i=0;i<str.length()&&namecount<=3;i++)
                 {
@@ -85,7 +83,6 @@ public class BoundSaver {
                         {neg=true;}
                         else{
                         tmpval=tmpval*10+(str.charAt(i)-'0');
-                        //System.out.println(tmpval);
                         }
                     }
                     else{

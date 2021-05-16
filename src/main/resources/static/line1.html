@@ -61,6 +61,89 @@
     </style>
 
     <script>
+        var tempid = -1,
+            data040 = [],
+            data070 = [],
+            dis010 = [],
+            dis020 = [],
+            press010 = [],
+            press020 = [],
+            bottleneck = 0,
+            stationData = Array(7).fill(0),
+            pieData = [
+                { value: 0, name: '0～10s' },
+                { value: 0, name: '10～20s' },
+                { value: 0, name: '20～30s' },
+                { value: 0, name: '30～40s' },
+                { value: 0, name: '40～50s' },
+                { value: 0, name: '50～60s' },
+                { value: 0, name: '60～70s' },
+                { value: 0, name: '70～80s' },
+                { value: 0, name: '80～90s' },
+                { value: 0, name: '90s以上' }
+            ],
+            PressPieData = [
+                { value: 0, name: '' },
+                { value: 0, name: '' },
+                { value: 0, name: '' },
+                { value: 0, name: '' },
+                { value: 0, name: '' },
+                { value: 0, name: '' },
+                { value: 0, name: '' }
+            ],
+            DisplacePieData = [
+                { value: 0, name: '' },
+                { value: 0, name: '' },
+                { value: 0, name: '' },
+                { value: 0, name: '' },
+                { value: 0, name: '' },
+                { value: 0, name: '' },
+                { value: 0, name: '' }
+            ],
+            TorquePieData = [
+                { value: 0, name: '' },
+                { value: 0, name: '' },
+                { value: 0, name: '' },
+                { value: 0, name: '' },
+                { value: 0, name: '' },
+                { value: 0, name: '' },
+                { value: 0, name: '' }
+            ],
+
+            id = [];
+        var station_status = Array(11).fill(0);//工位状态监控
+        var station_isread = Array(11).fill(2);
+        var sp_status = Array(17).fill(0);//0代表产线未运行，1代表产线正常运行，2代表产线出现错误
+        var sp_isread = Array(76).fill(2);//0未读，1已读，2为初始状态
+        var sc_status = Array(17).fill(0);
+        var sc_isread = Array(17).fill(2);
+        var PLCstatus = { status: 0, isread: 2 };
+
+        //压装工位阈值
+        var HighPress = 5;
+        var LowPress = -5;
+        var AveragePress = 0;
+
+        //拧紧工位阈值
+        var HighTight = 5;
+        var LowTight = -5;
+        var AverageTight = 0;
+
+        //潜在危险计数器
+        var lowCount040 = 0;
+        var highCount040 = 0;
+        var lowCount070 = 0;
+        var highCount070 = 0;
+        var lowCount010 = 0;
+        var highCount010 = 0;
+        var lowCount020 = 0;
+        var highCount020 = 0;
+
+        var productID;
+        var all_status = 0;
+        var stationStatus = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        var stationBypass = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
         $(function () {
             Chart1.showLoading();
             Chart2.showLoading();
@@ -78,6 +161,13 @@
             var checkbox2 = $('#cboxB');
             var checkbox3 = $('#cboxC');
             var checkbox4 = $('#cboxD');
+
+            $.getJSON("http://localhost:8080/spbound", function (json_data) {//注意！！本段代码只会在网页打开时执行一次！！所以请在确保后端正常后再打开网页！！
+                HighPress = json_data['PU'];
+                LowPress = json_data['PL'];
+                HighTight = json_data['SU'];
+                LowTight = json_data['SL'];
+            });
 
             checkbox1.click(function () {
                 var c1 = $('#chart3');
@@ -201,12 +291,11 @@
                     }
                 }
             })
-            getData();
-            freshLine();
+            setTimeout('freshLine()', 50);
         });
 
         function ResizeLoading() {
-            setTimeout("Resize()", "1");
+            setTimeout("Resize()", 50);
         }
 
         function Resize() {
@@ -271,13 +360,13 @@
                                 <h3 align="center">拧紧参数阈值修改</h3>
                                 <p>
                                 <div class="input-group">
-                                    <span class="input-group-addon" id="th">高位阈值(当前值: 5)</span>
+                                    <span class="input-group-addon" id="th">高位阈值</span>
                                     <input type="text" class="form-control" id="Thigh" aria-describedby="basic-addon3">
                                 </div>
                                 </p>
                                 <p>
                                 <div class="input-group">
-                                    <span class="input-group-addon" id="tl">低位阈值(当前值: -5)</span>
+                                    <span class="input-group-addon" id="tl">低位阈值</span>
                                     <input type="text" class="form-control" id="Tlow" aria-describedby="basic-addon3">
                                 </div>
                                 </p>
@@ -313,14 +402,14 @@
                                     <h3 align="center">压装参数位移值阈值修改</h3>
                                     <p>
                                     <div class="input-group">
-                                        <span class="input-group-addon" id="ph">高位阈值(当前值: 5)</span>
+                                        <span class="input-group-addon" id="ph">高位阈值</span>
                                         <input type="text" class="form-control" id="Phigh"
                                             aria-describedby="basic-addon3">
                                     </div>
                                     </p>
                                     <p>
                                     <div class="input-group">
-                                        <span class="input-group-addon" id="pl">低位阈值(当前值: -5)</span>
+                                        <span class="input-group-addon" id="pl">低位阈值</span>
                                         <input type="text" class="form-control" id="Plow"
                                             aria-describedby="basic-addon3">
                                     </div>
@@ -662,84 +751,6 @@
     </div>
 
     <script>
-        var tempid = -1,
-            data040 = [],
-            data070 = [],
-            dis010 = [],
-            dis020 = [],
-            press010 = [],
-            press020 = [],
-            bottleneck = 0,
-            stationData = Array(7).fill(0),
-            pieData = [
-                { value: 0, name: '0～10s' },
-                { value: 0, name: '10～20s' },
-                { value: 0, name: '20～30s' },
-                { value: 0, name: '30～40s' },
-                { value: 0, name: '40～50s' },
-                { value: 0, name: '50～60s' },
-                { value: 0, name: '60～70s' },
-                { value: 0, name: '70～80s' },
-                { value: 0, name: '80～90s' },
-                { value: 0, name: '90s以上' }
-            ],
-            PressPieData = [
-                { value: 0, name: '' },
-                { value: 0, name: '' },
-                { value: 0, name: '' },
-                { value: 0, name: '' },
-                { value: 0, name: '' },
-                { value: 0, name: '' },
-                { value: 0, name: '' }
-            ],
-            DisplacePieData = [
-                { value: 0, name: '' },
-                { value: 0, name: '' },
-                { value: 0, name: '' },
-                { value: 0, name: '' },
-                { value: 0, name: '' },
-                { value: 0, name: '' },
-                { value: 0, name: '' }
-            ],
-            TorquePieData = [
-                { value: 0, name: '' },
-                { value: 0, name: '' },
-                { value: 0, name: '' },
-                { value: 0, name: '' },
-                { value: 0, name: '' },
-                { value: 0, name: '' },
-                { value: 0, name: '' }
-            ],
-
-            id = [];
-        var station_status = Array(11).fill(0);//工位状态监控
-        var station_isread = Array(11).fill(2);
-        var sp_status = Array(17).fill(0);//0代表产线未运行，1代表产线正常运行，2代表产线出现错误
-        var sp_isread = Array(76).fill(2);//0未读，1已读，2为初始状态
-        var sc_status = Array(17).fill(0);
-        var sc_isread = Array(17).fill(2);
-        var PLCstatus = { status: 0, isread: 2 };
-
-        //压装工位阈值
-        var HighPress = 5;
-        var LowPress = -5;
-        var AveragePress = 0;
-
-        //拧紧工位阈值
-        var HighTight = 5;
-        var LowTight = -5;
-        var AverageTight = 0;
-
-        //潜在危险计数器
-        var lowCount040 = 0;
-        var highCount040 = 0;
-        var lowCount070 = 0;
-        var highCount070 = 0;
-        var lowCount010 = 0;
-        var highCount010 = 0;
-        var lowCount020 = 0;
-        var highCount020 = 0;
-
         //产线状态监控按钮onclick函数
         function statusBtn() {
             for (var i = 1; i <= 7; i++) {
@@ -919,33 +930,27 @@
         function productJudge() {
             var productString = "";
             var productUrl = "http://localhost:8080/PASS_OK_NG";
-            var all_status;
-            var productID;
+
             $.getJSON(productUrl, function (json_data) {
+                var now = new Date();
+                var nowtime = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds() + "  ";
                 all_status = json_data['allok'];
                 productID = Number(json_data['id']);
-            })
-
-            var now = new Date();
-            var nowtime = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds() + "  ";
-            if (!all_status) {
-                var stationStatus = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-                var stationBypass = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-                $.getJSON(productUrl, function (json_data) {
+                if (all_status == 0) {
                     stationStatus[2] = json_data['line1_station2_product_OK'];
-                    stationBypass[2] = json_data['line1_station2_bypass'];
+                    stationBypass[2] = json_data['line1_station2_product_bypass'];
                     stationStatus[3] = json_data['line1_station3_product_OK'];
-                    stationBypass[3] = json_data['line1_station3_bypass'];
+                    stationBypass[3] = json_data['line1_station3_product_bypass'];
                     stationStatus[4] = json_data['line1_station4_product_OK'];
-                    stationBypass[4] = json_data['line1_station4_bypass'];
+                    stationBypass[4] = json_data['line1_station4_product_bypass'];
                     stationStatus[5] = json_data['line1_station5_product_OK'];
-                    stationBypass[5] = json_data['line1_station5_bypass'];
+                    stationBypass[5] = json_data['line1_station5_product_bypass'];
                     stationStatus[7] = json_data['line1_station7_product_OK'];
-                    stationBypass[7] = json_data['line1_station7_bypass'];
+                    stationBypass[7] = json_data['line1_station7_product_bypass'];
                     stationStatus[8] = json_data['line1_station8_product_OK'];
-                    stationBypass[8] = json_data['line1_station8_bypass'];
+                    stationBypass[8] = json_data['line1_station8_product_bypass'];
                     stationStatus[10] = json_data['line1_station10_product_OK'];
-                    stationBypass[10] = json_data['line1_station10_bypass'];
+                    stationBypass[10] = json_data['line1_station10_product_bypass'];
                     productString = nowtime + "产品" + productID + "质量不合格，问题工位为：";
                     if (!stationBypass[2] && !stationStatus[2]) {
                         productString += "<span class=\"label label-danger\">OP010SA</span> ";
@@ -969,13 +974,12 @@
                         productString += "<span class=\"label label-danger\">OP80A</span> ";
                     }
                     $('#productWatch').append("<p>" + productString + "</p>");
-                })
-
-            }
-            else {
-                productString = nowtime + "产品" + productID + "质量合格";
-                $('#productWatch').append("<p>" + productString + "</p>");
-            }
+                }
+                else {
+                    productString = nowtime + "产品" + productID + "质量合格";
+                    $('#productWatch').append("<p>" + productString + "</p>");
+                }
+            })
         }
 
         //KPI获取函数
@@ -1029,12 +1033,19 @@
                 TorquePiechart.hideLoading();
                 DisplacePiechart.hideLoading();
                 Colchart.hideLoading();
+                Chart1.setOption(Chart1option);
+                Chart2.setOption(Chart2option);
+                Chart3.setOption(Chart3option);
+                Chart4.setOption(Chart4option);
+                Chart5.setOption(Chart5option);
+                Chart6.setOption(Chart6option);
             });
 
             $.getJSON(timeUrl, function (json_data) {
                 for (var i = 0; i < 10; i++) {
                     pieData[i].value = Number(json_data[i]);
                 }
+                timeChart.setOption(timeChartoption);
             });
 
             $.getJSON(recent50Url, function (json_data) {
@@ -1056,6 +1067,10 @@
                     TorquePieData[temp].value = json_data[i + 2];
                     temp += 1;
                 }
+
+                PressPiechart.setOption(PressPieOption);
+                TorquePiechart.setOption(TorquePieOption);
+                DisplacePiechart.setOption(DisplacePieOption);
             });
 
             $.getJSON(station, function (json_data) {
@@ -1094,6 +1109,7 @@
 
                 }
                 $("#bottlenID").text((temp + "号 当前产品id为" + Number(json_data['ID'])));
+                Colchart.setOption(ColChartoption);
             });
 
             $.getJSON(numOfProductUrl, function (json_data) {
@@ -1116,14 +1132,19 @@
         }
 
         function productBasedData() {
+            $.getJSON("http://localhost:8080/sample1", function (json_data) {
+                tempid = Number(json_data[0]['id']);
+            });
+            if (tempid == id[id.length - 1])
+                return;
             getData();
+            setTimeout("judge()", "1");
+            // judge();
             getKPI();
             productJudge();
-            judge();
         }
 
         function judge() {
-
             //监测040工位
             if (data040[data040.length - 1] > HighTight) {
                 highCount040++;
@@ -1340,23 +1361,28 @@
             Chart2.setOption(TightwarningLineOp);
             Chart3.setOption(PresswarningLineOp);
             Chart5.setOption(PresswarningLineOp);
+            $('#ph').text("高位阈值(当前值: " + HighPress + ")");
+            $('#pl').text("低位阈值(当前值: " + LowPress + ")");
+            $('#th').text("高位阈值(当前值: " + HighTight + ")");
+            $('#tl').text("低位阈值(当前值: " + LowTight + ")");
         }
         //压装参数修改提交按钮onclick函数
         function ChangePress() {
             pressFlag = 1;
             LowPress = Number(document.getElementById('Plow').value);
             HighPress = Number(document.getElementById('Phigh').value);
-            $('#ph').text("高位阈值(当前值: " + HighPress + ")");
-            $('#pl').text("低位阈值(当前值: " + LowPress + ")");
+            var temp = "http://localhost:8080/get?SU=" + HighTight + "&SL=" + LowTight + "&PU=" + HighPress + "&PL=" + LowPress;
+            $.get(temp);
+            freshLine();
         }
 
         //拧紧参数修改提交按钮onclick函数
         function ChangeTight() {
             tightFlag = 1;
             LowTight = Number(document.getElementById('Tlow').value);
-            HighTight = Number(document.getElementById('Thigh').value);
-            $('#th').text("高位阈值(当前值: " + HighTight + ")");
-            $('#tl').text("低位阈值(当前值: " + LowTight + ")");
+            HighTight = Number(document.getElementById('Thigh').value); 
+            var temp = "http://localhost:8080/get?SU=" + HighTight + "&SL=" + LowTight + "&PU=" + HighPress + "&PL=" + LowPress;
+            $.get(temp);
             freshLine();
         }
 
@@ -1882,11 +1908,6 @@
 
         setInterval(function () {
             stateWatch();
-            $.getJSON("http://localhost:8080/sample1", function (json_data) {
-                tempid = Number(json_data[0]['id']);
-            });
-            if (tempid == id[id.length - 1])
-                return;
             productBasedData();
         }, 1000);
 
@@ -1925,5 +1946,4 @@
 
     </script>
 </body>
-
 </html>

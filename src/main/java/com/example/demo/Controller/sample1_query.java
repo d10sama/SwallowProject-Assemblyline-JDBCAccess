@@ -251,7 +251,7 @@ public class sample1_query {
         for(Map<String,Object> map: result1)
             for(String s: map.keySet())
             {
-                if((Boolean) map.get(s)==true)
+                if(Boolean.parseBoolean(map.get(s).toString())==true)
                     qualifiedcount_press++;
 
             }
@@ -259,7 +259,7 @@ public class sample1_query {
         for(Map<String,Object> map: result2)
             for(String s: map.keySet())
             {
-                if((Boolean) map.get(s)==true) {
+                if(Boolean.parseBoolean(map.get(s).toString())==true) {
                     qualifiedcount_press++;
                 }
             }
@@ -267,7 +267,7 @@ public class sample1_query {
         for(Map<String,Object> map: result3)
             for(String s: map.keySet())
             {
-                if( (int)map.get(s)==1) {
+                if( Integer.parseInt(map.get(s).toString())!=0) {
                     qualifiedcount_screw++;
                 }
             }
@@ -276,8 +276,9 @@ public class sample1_query {
         jdbcTemplate1.execute(String.format(command_fini,id));
 
         //向map存入数据
-        press.put("press_percent",(double)qualifiedcount_press/id);
-        screw.put("screw_percent",(double)qualifiedcount_screw/(id*80));
+        press.put("press_percent",(double)qualifiedcount_press/50);
+
+        screw.put("screw_percent",(double)qualifiedcount_screw/(20*50));
         List<Map<String, Object>> outcome = new LinkedList<>();
         outcome.add(kpi);
         outcome.add(press);

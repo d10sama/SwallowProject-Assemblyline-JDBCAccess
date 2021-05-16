@@ -86,13 +86,13 @@ public class BottleNeck {
             idignore++;
         }
         //下面这句话证明对于station10以外的位置，charat(14)为"_",
-        //System.out.println(neckname+":"+neckname.charAt(14));
         if(neckname.charAt(14)=='_')
             neckname=new String(""+neckname.charAt(13));
         else if(neckname.charAt(14)=='0')
             neckname="10";
         else
             neckname="error";
+
         tmp.put(Neck,neckname);
         return tmp;
     }

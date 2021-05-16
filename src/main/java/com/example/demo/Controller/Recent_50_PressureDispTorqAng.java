@@ -135,7 +135,6 @@ public class Recent_50_PressureDispTorqAng {
                 if(Float.parseFloat(map.get(s).toString())!=0f)
                 {
                     tmpval=Float.parseFloat(map.get(s).toString());
-                    //System.out.println(s+map.get(s).toString());
                     p.add(tmpval);
                     //最大值记录
                     if(Ptopcount==0) {
@@ -151,7 +150,6 @@ public class Recent_50_PressureDispTorqAng {
                 if(Float.parseFloat(map.get(s).toString())!=0f)
                 {
                     tmpval=Float.parseFloat(map.get(s).toString());
-                    //System.out.println(s+map.get(s).toString());
                     d.add(tmpval);
                     //最大值记录
                     if(Dtopcount==0) {
@@ -169,7 +167,6 @@ public class Recent_50_PressureDispTorqAng {
                 {
                     tmpval=Float.parseFloat(map.get(s).toString());
                     t.add(tmpval);
-                    //System.out.println(s+map.get(s).toString());
                     //最大值记录
                     if(Ttopcount==0) {
                         Tup=tmpval;
@@ -184,7 +181,6 @@ public class Recent_50_PressureDispTorqAng {
                 {
                     tmpval=Float.parseFloat(map.get(s).toString());
                     a.add(tmpval);
-                    //System.out.println(s+map.get(s).toString());
                     //最大值记录
                     if(Atopcount==0) {
                         Aup=tmpval;
