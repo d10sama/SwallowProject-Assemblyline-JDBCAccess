@@ -41,7 +41,14 @@ public class State_Table {
             for(String s:map.keySet())
             {
                 if(count<=13)
-                {   tmp.put(s,map.get(s).toString());}
+                {   
+                    
+                    //tmp.put(s,map.get(s).toString());
+                    if(map.get(s).toString().equals("true"))
+                        tmp.put(s,"1");
+                    eles
+                        tmp.pu(s,"0");
+                }
                 else if(count==14)
                 {
                     String tempstring=map.get(s).toString();
