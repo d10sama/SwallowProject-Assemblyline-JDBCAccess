@@ -189,7 +189,7 @@ public class Recent_50_PressureDispTorqAng {
 //                 }
 //             }
             //将各个最大值分区
-            float Ppartition=(Pup-Pdown)/8,Dpartition=(Dup-Ddown)/8,Tpartition=(Tup-Tdown)/8,Apartition=(Aup-Adown)/8;
+            float Ppartition=(Pup-Pdown)/8,Dpartition=(Dup-Ddown)/8,Tpartition=(Tup-Tdown)/8;//,Apartition=(Aup-Adown)/8;
             int[] PCOUNT={0,0,0,0,0,0,0,0};
             int[] DCOUNT={0,0,0,0,0,0,0,0};
             int[] TCOUNT={0,0,0,0,0,0,0,0};
@@ -200,7 +200,7 @@ public class Recent_50_PressureDispTorqAng {
            // Atopcount=0;
             //区间内数量统计
             for(int i=0;i<7;i++) {
-                if(Ptopcount>=p.size()||Dtopcount>=d.size()||Ttopcount>=t.size()||Atopcount>=a.size())
+                if(Ptopcount>=p.size()||Dtopcount>=d.size()||Ttopcount>=t.size()/*||Atopcount>=a.size()*/)
                     break;
                 while (p.get(Ptopcount) >= (Pup - Ppartition * (i + 1)) && p.get(Ptopcount) <= (Pup - Ppartition * i))
                 {
@@ -231,8 +231,8 @@ public class Recent_50_PressureDispTorqAng {
 //                         break;
 //                 }
             }
-            Float p1,p2,d1,d2,t1,t2,a1,a2;
-            Integer p3,t3,d3,a3;
+            Float p1,p2,d1,d2,t1,t2,/*a1,a2*/;
+            Integer p3,t3,d3,/*a3*/;
             LinkedList<String> result=new LinkedList<>();
 
             //向ans中循环插入结果
