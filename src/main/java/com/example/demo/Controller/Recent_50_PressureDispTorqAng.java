@@ -124,9 +124,9 @@ public class Recent_50_PressureDispTorqAng {
         List<Map<String,Object>> resultT=jdbcTemplate1.queryForList(Tunion);
         float Tup=0f,Tdown=0f;
         int Ttopcount=0;
-        List<Map<String,Object>> resultA=jdbcTemplate1.queryForList(Aunion);
-        float Aup=0f,Adown=0f;
-        int Atopcount=0;
+//         List<Map<String,Object>> resultA=jdbcTemplate1.queryForList(Aunion);
+//         float Aup=0f,Adown=0f;
+//         int Atopcount=0;
         //解析结果，对于8*50我固定以（上限-下限）/8并且统计每段的数量值
 
         for(Map<String,Object> map:resultP)
@@ -174,30 +174,30 @@ public class Recent_50_PressureDispTorqAng {
                     }
                 }
             }
-        for(Map<String,Object> map:resultA)
-            for(String s:map.keySet())
-            {
-                if(Float.parseFloat(map.get(s).toString())!=0f)
-                {
-                    tmpval=Float.parseFloat(map.get(s).toString());
-                    a.add(tmpval);
-                    //最大值记录
-                    if(Atopcount==0) {
-                        Aup=tmpval;
-                        Atopcount++;
-                    }
-                }
-            }
+//         for(Map<String,Object> map:resultA)
+//             for(String s:map.keySet())
+//             {
+//                 if(Float.parseFloat(map.get(s).toString())!=0f)
+//                 {
+//                     tmpval=Float.parseFloat(map.get(s).toString());
+//                     a.add(tmpval);
+//                     //最大值记录
+//                     if(Atopcount==0) {
+//                         Aup=tmpval;
+//                         Atopcount++;
+//                     }
+//                 }
+//             }
             //将各个最大值分区
             float Ppartition=(Pup-Pdown)/8,Dpartition=(Dup-Ddown)/8,Tpartition=(Tup-Tdown)/8,Apartition=(Aup-Adown)/8;
             int[] PCOUNT={0,0,0,0,0,0,0,0};
             int[] DCOUNT={0,0,0,0,0,0,0,0};
             int[] TCOUNT={0,0,0,0,0,0,0,0};
-            int[] ACOUNT={0,0,0,0,0,0,0,0};
+           // int[] ACOUNT={0,0,0,0,0,0,0,0};
             Ptopcount=0;
             Dtopcount=0;
             Ttopcount=0;
-            Atopcount=0;
+           // Atopcount=0;
             //区间内数量统计
             for(int i=0;i<7;i++) {
                 if(Ptopcount>=p.size()||Dtopcount>=d.size()||Ttopcount>=t.size()||Atopcount>=a.size())
@@ -223,13 +223,13 @@ public class Recent_50_PressureDispTorqAng {
                     if(Ttopcount>=t.size())
                         break;
                 }
-                while(a.get(Atopcount)>=(Aup-Apartition*(i+1))&&a.get(Atopcount)<=(Aup-Apartition*i))
-                {
-                    ACOUNT[i]++;
-                    Atopcount++;
-                    if(Atopcount>=a.size())
-                        break;
-                }
+//                 while(a.get(Atopcount)>=(Aup-Apartition*(i+1))&&a.get(Atopcount)<=(Aup-Apartition*i))
+//                 {
+//                     ACOUNT[i]++;
+//                     Atopcount++;
+//                     if(Atopcount>=a.size())
+//                         break;
+//                 }
             }
             Float p1,p2,d1,d2,t1,t2,a1,a2;
             Integer p3,t3,d3,a3;
@@ -262,13 +262,13 @@ public class Recent_50_PressureDispTorqAng {
                 result.add(t2.toString());
                 result.add(t3.toString());
 
-                a1=(Aup-Apartition*i);
-                a2=(Aup-Apartition*(i+1));
-                a3=ACOUNT[i];
-                result.add("a");
-                result.add(a1.toString());
-                result.add(a2.toString());
-                result.add(a3.toString());
+//                 a1=(Aup-Apartition*i);
+//                 a2=(Aup-Apartition*(i+1));
+//                 a3=ACOUNT[i];
+//                 result.add("a");
+//                 result.add(a1.toString());
+//                 result.add(a2.toString());
+//                 result.add(a3.toString());
             }
         return result;
     }
